@@ -47,7 +47,7 @@ void Phenotype::randomInit()
         int r = rand() % 256;
         int g = rand() % 256;
         int b = rand() % 256;
-        int a = 255; // rand() % 256;
+        int a = rand() % 256;
 
         genotype.insert(genotype.end(), { posX, posY, radius, r, g, b, a });
     }
@@ -58,10 +58,10 @@ void Phenotype::drawCircle(int *genes)
     int x = *genes++;
     int y = *genes++;
     int R = *genes++;
-    int r = *genes++;
-    int g = *genes++;
-    int b = *genes++;
-    int a = *genes++;
+    Uint32 r = (Uint32)*genes++;
+    Uint32 g = (Uint32)*genes++;
+    Uint32 b = (Uint32)*genes++;
+    uint8_t a = (uint8_t)*genes++;
 
     for (int h = 0; h < R * 2; h++)
     {
@@ -75,17 +75,27 @@ void Phenotype::drawCircle(int *genes)
                 int ypos = y + dy;
                 if (xpos > 0 && xpos < data->w && ypos > 0 && ypos < data->h)
                 {
-                    unsigned char* pixels = (unsigned char*)data->pixels;
+                    Uint32 R, G, B;
+                    Uint32 *row = (Uint32 *)data->pixels + ypos * data->pitch / 4 + xpos;
+
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-                    pixels[4 * (ypos * data->w + xpos) + 0] = (unsigned char)r;
-                    pixels[4 * (ypos * data->w + xpos) + 1] = (unsigned char)g;
-                    pixels[4 * (ypos * data->w + xpos) + 2] = (unsigned char)b;
-                    pixels[4 * (ypos * data->w + xpos) + 3] = (unsigned char)a;
+                    R = ((unsigned char *)row)[0];
+                    G = ((unsigned char *)row)[1];
+                    B = ((unsigned char *)row)[2];
 #else
-                    pixels[4 * (ypos * data->w + xpos) + 3] = (unsigned char)r;
-                    pixels[4 * (ypos * data->w + xpos) + 2] = (unsigned char)g;
-                    pixels[4 * (ypos * data->w + xpos) + 1] = (unsigned char)b;
-                    pixels[4 * (ypos * data->w + xpos) + 0] = (unsigned char)a;
+                    R = ((unsigned char *)row)[3];
+                    G = ((unsigned char *)row)[2];
+                    B = ((unsigned char *)row)[1];
+#endif           
+                    R = R * (255 - a) + r * a;
+                    G = G * (255 - a) + g * a;
+                    B = B * (255 - a) + b * a;
+                    Uint32 A = 255;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+                    *row = ((R & 0xff00) << 16) | ((G & 0xff00) << 8) | (B & 0xff00) | A;
+#else
+                    *row = ((A & 0xff00) << 16) | ((B & 0xff00) << 8) | (G & 0xff00) | R;
 #endif
                 }
             }
@@ -95,7 +105,7 @@ void Phenotype::drawCircle(int *genes)
 
 void Phenotype::draw()
 {
-    std::fill((Uint32*)data->pixels, (Uint32*)data->pixels + data->w * data->h, 0); // clear existing data
+    SDL_FillRect(data, NULL, 0); // clear existing data
     int *ptr = genotype.data();
     for (int c = 0; c < numCircles; c++)
         drawCircle(ptr + c * 7);

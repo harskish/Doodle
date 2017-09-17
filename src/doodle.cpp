@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 
     atexit(SDL_Quit);
 
-    SDL_Surface* image = SDL_LoadBMP("mona.bmp"); // CPU memory
+    SDL_Surface* image = SDL_LoadBMP("mona_half.bmp"); // CPU memory
     if (image == NULL)
     {
         std::cout << "Unable to load image\n";
