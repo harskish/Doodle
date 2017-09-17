@@ -1,0 +1,31 @@
+#pragma once
+
+#include "SDL.h"
+#include <algorithm>
+#include <vector>
+
+/*
+    A phenotype (an individual) in an evolutionary algorithm
+*/
+
+class Phenotype
+{
+public:
+    Phenotype(SDL_Surface const* reference);
+    ~Phenotype();
+
+    Phenotype& operator=(Phenotype const&);
+    Phenotype(Phenotype const&);
+
+    float fitness();
+    void crossover(Phenotype &other);
+    void mutate();
+
+private:
+    void randomInit();
+
+    // N circles: x | y | R | r | g | b | a
+    std::vector<int> genotype; // the chromosomes of the individual
+    SDL_Surface* data; // image produced by this individual's genotype
+    SDL_Surface const* target;
+};

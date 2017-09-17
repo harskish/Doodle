@@ -1,8 +1,6 @@
-// Doodle.cpp : Defines the entry point for the console application.
-//
 #include <iostream>
 #include "SDL.h"
-#undef main
+#include "GeneticOptimizer.h"
 
 namespace Settings
 {
@@ -12,6 +10,8 @@ namespace Settings
     int maxTris = 1024;
 };
 
+// SDL defines its own main
+#undef main
 int main(int argc, char *argv[])
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     int width = image->w;
     int height = image->h;
 
-    SDL_Window* window = SDL_CreateWindow("Doodle", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width * 2, height, 0);
+    SDL_Window* window = SDL_CreateWindow("Doodle", 0, 0, width * 2, height, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, image); // GPU memory
 
@@ -40,13 +40,19 @@ int main(int argc, char *argv[])
     SDL_RenderCopy(renderer, texture, NULL, &dstrect);
     SDL_RenderPresent(renderer);
 
+    // Initialize optimizer
+    GeneticOptimizer opt(image);
+
     // Main loop
     uint64_t iterations = 0;
     bool running = true;
     while (running)
     {
-        SDL_Delay(50);
-
+        // Advance optimization
+        opt.step();
+        
+        // Poll events
+        SDL_Delay(200);
         SDL_Event event;
         SDL_PollEvent(&event);
         switch (event.type)
