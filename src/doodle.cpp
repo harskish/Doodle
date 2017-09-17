@@ -2,14 +2,6 @@
 #include "SDL.h"
 #include "GeneticOptimizer.h"
 
-namespace Settings
-{
-    int width;
-    int height;
-    int populationSize = 8;
-    int maxTris = 1024;
-};
-
 // SDL defines its own main
 #undef main
 int main(int argc, char *argv[])
@@ -32,10 +24,10 @@ int main(int argc, char *argv[])
     int width = image->w;
     int height = image->h;
 
-    SDL_Window* window = SDL_CreateWindow("Doodle", 0, 0, width * 2, height, 0);
+    SDL_Window* window = SDL_CreateWindow("Doodle", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width * 2, height, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, image); // GPU memory
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
     SDL_Rect dstrect = { 0, 0, width, height };
     SDL_RenderCopy(renderer, texture, NULL, &dstrect);
@@ -54,9 +46,9 @@ int main(int argc, char *argv[])
         
         // Update preview
         if (updated)
-        {
+        {   
             progressTexture = SDL_CreateTextureFromSurface(renderer, opt.getCurrentBest());
-            SDL_Rect dstrect = { width, 0, width * 2, height };
+            SDL_Rect dstrect = { width, 0, width, height }; // x, y, w, h
             SDL_RenderFillRect(renderer, &dstrect);
             SDL_RenderCopy(renderer, progressTexture, NULL, &dstrect);
             SDL_RenderPresent(renderer);

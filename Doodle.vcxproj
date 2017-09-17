@@ -167,6 +167,7 @@
     <ClInclude Include="src\Optimizer.h" />
     <ClInclude Include="src\Phenotype.h" />
     <ClInclude Include="src\targetver.h" />
+    <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

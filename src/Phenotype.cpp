@@ -3,7 +3,7 @@
 Phenotype::Phenotype(SDL_Surface const* reference)
 {
     target = reference;
-    data = SDL_CreateRGBSurface(SDL_SWSURFACE, target->w, target->h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+    data = surfaceWithEndian(target->w, target->h);
     numCircles = 5;
     randomInit();
 }
@@ -28,7 +28,7 @@ Phenotype::Phenotype(Phenotype const& other)
     target = other.target;
     genotype = other.genotype;
     numCircles = other.numCircles;
-    data = SDL_CreateRGBSurface(SDL_SWSURFACE, target->w, target->h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+    data = surfaceWithEndian(target->w, target->h);
     if (SDL_BlitSurface(other.data, NULL, data, NULL))
         throw std::runtime_error("Failed to copy phenotype data");
 }
@@ -43,11 +43,11 @@ void Phenotype::randomInit()
 
         int posX = -w/2 + rand() % (2*w);
         int posY = -h/2 + rand() % (2*h);
-        int radius = rand() % std::min(w, h) / 2;
+        int radius = rand() % (std::min(w, h) / 2);
         int r = rand() % 256;
         int g = rand() % 256;
         int b = rand() % 256;
-        int a = rand() % 256;
+        int a = 255; // rand() % 256;
 
         genotype.insert(genotype.end(), { posX, posY, radius, r, g, b, a });
     }
@@ -76,10 +76,17 @@ void Phenotype::drawCircle(int *genes)
                 if (xpos > 0 && xpos < data->w && ypos > 0 && ypos < data->h)
                 {
                     unsigned char* pixels = (unsigned char*)data->pixels;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
                     pixels[4 * (ypos * data->w + xpos) + 0] = (unsigned char)r;
                     pixels[4 * (ypos * data->w + xpos) + 1] = (unsigned char)g;
                     pixels[4 * (ypos * data->w + xpos) + 2] = (unsigned char)b;
                     pixels[4 * (ypos * data->w + xpos) + 3] = (unsigned char)a;
+#else
+                    pixels[4 * (ypos * data->w + xpos) + 3] = (unsigned char)r;
+                    pixels[4 * (ypos * data->w + xpos) + 2] = (unsigned char)g;
+                    pixels[4 * (ypos * data->w + xpos) + 1] = (unsigned char)b;
+                    pixels[4 * (ypos * data->w + xpos) + 0] = (unsigned char)a;
+#endif
                 }
             }
         }
@@ -88,12 +95,13 @@ void Phenotype::drawCircle(int *genes)
 
 void Phenotype::draw()
 {
+    std::fill((Uint32*)data->pixels, (Uint32*)data->pixels + data->w * data->h, 0); // clear existing data
     int *ptr = genotype.data();
     for (int c = 0; c < numCircles; c++)
         drawCircle(ptr + c * 7);
 }
 
-// Negative sum of Euklidean distances
+// Negative sum of squared distances
 float Phenotype::fitness()
 {
     float sum = 0.0f;
@@ -101,12 +109,18 @@ float Phenotype::fitness()
     {
         for (int w = 0; w < data->w; w++)
         {
-            unsigned char* src = (unsigned char*)data->pixels;
-            unsigned char* dst = (unsigned char*)target->pixels;
+            const unsigned char* src = (const unsigned char*)data->pixels;
+            const unsigned char* dst = (const unsigned char*)target->pixels;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
             int dr = src[4 * (h * data->w + w) + 0] - dst[4 * (h * data->w + w) + 0];
             int dg = src[4 * (h * data->w + w) + 1] - dst[4 * (h * data->w + w) + 1];
             int db = src[4 * (h * data->w + w) + 2] - dst[4 * (h * data->w + w) + 2];
-            sum += sqrt(dr*dr + dg*dg + db*db);
+#else
+            int dr = src[4 * (h * data->w + w) + 3] - dst[4 * (h * data->w + w) + 3];
+            int dg = src[4 * (h * data->w + w) + 2] - dst[4 * (h * data->w + w) + 2];
+            int db = src[4 * (h * data->w + w) + 1] - dst[4 * (h * data->w + w) + 1];
+#endif
+            sum += (dr*dr + dg*dg + db*db);
         }
     }
 

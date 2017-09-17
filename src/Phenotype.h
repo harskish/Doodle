@@ -1,8 +1,9 @@
 #pragma once
 
-#include "SDL.h"
 #include <algorithm>
 #include <vector>
+#include "SDL.h"
+#include "Utils.h"
 
 /*
     A phenotype (an individual) in an evolutionary algorithm

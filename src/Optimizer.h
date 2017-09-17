@@ -1,6 +1,7 @@
 #pragma once
 #include <float.h>
 #include "SDL.h"
+#include "Utils.h"
 
 /*
     Base class for an optimization algorithm
