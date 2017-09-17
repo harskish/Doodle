@@ -12,7 +12,7 @@ public:
     GeneticOptimizer(SDL_Surface const *reference);
     ~GeneticOptimizer();
 
-    virtual void step();
+    virtual bool step();
 
 private:
     int generation;

@@ -4,6 +4,7 @@ Phenotype::Phenotype(SDL_Surface const* reference)
 {
     target = reference;
     data = SDL_CreateRGBSurface(SDL_SWSURFACE, target->w, target->h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+    numCircles = 5;
     randomInit();
 }
 
@@ -16,6 +17,7 @@ Phenotype& Phenotype::operator=(Phenotype const& other)
 {
     Phenotype fresh(other.target);
     fresh.genotype = other.genotype;
+    fresh.numCircles = other.numCircles;
     if (SDL_BlitSurface(other.data, NULL, fresh.data, NULL))
         throw std::runtime_error("Failed to copy phenotype data");
     return fresh;
@@ -25,6 +27,7 @@ Phenotype::Phenotype(Phenotype const& other)
 {
     target = other.target;
     genotype = other.genotype;
+    numCircles = other.numCircles;
     data = SDL_CreateRGBSurface(SDL_SWSURFACE, target->w, target->h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
     if (SDL_BlitSurface(other.data, NULL, data, NULL))
         throw std::runtime_error("Failed to copy phenotype data");
@@ -32,9 +35,7 @@ Phenotype::Phenotype(Phenotype const& other)
 
 void Phenotype::randomInit()
 {
-    const int n_circles = 1;
-
-    for (int i = 0; i < n_circles; i++)
+    for (int i = 0; i < numCircles; i++)
     {
         // TODO: normalize chromosomes to be in range [0,255]?
         int w = target->w;
@@ -42,7 +43,7 @@ void Phenotype::randomInit()
 
         int posX = -w/2 + rand() % (2*w);
         int posY = -h/2 + rand() % (2*h);
-        int radius = rand() % std::min(w, h);
+        int radius = rand() % std::min(w, h) / 2;
         int r = rand() % 256;
         int g = rand() % 256;
         int b = rand() % 256;
@@ -62,9 +63,9 @@ void Phenotype::drawCircle(int *genes)
     int b = *genes++;
     int a = *genes++;
 
-    for (int w = 0; w < R * 2; w++)
+    for (int h = 0; h < R * 2; h++)
     {
-        for (int h = 0; h < R * 2; h++)
+        for (int w = 0; w < R * 2; w++)
         {
             int dx = R - w; // horizontal offset
             int dy = R - h; // vertical offset
@@ -87,12 +88,29 @@ void Phenotype::drawCircle(int *genes)
 
 void Phenotype::draw()
 {
-    drawCircle(genotype.data());
+    int *ptr = genotype.data();
+    for (int c = 0; c < numCircles; c++)
+        drawCircle(ptr + c * 7);
 }
 
+// Negative sum of Euklidean distances
 float Phenotype::fitness()
 {
-    return 0.0f;
+    float sum = 0.0f;
+    for (int h = 0; h < data->h; h++)
+    {
+        for (int w = 0; w < data->w; w++)
+        {
+            unsigned char* src = (unsigned char*)data->pixels;
+            unsigned char* dst = (unsigned char*)target->pixels;
+            int dr = src[4 * (h * data->w + w) + 0] - dst[4 * (h * data->w + w) + 0];
+            int dg = src[4 * (h * data->w + w) + 1] - dst[4 * (h * data->w + w) + 1];
+            int db = src[4 * (h * data->w + w) + 2] - dst[4 * (h * data->w + w) + 2];
+            sum += sqrt(dr*dr + dg*dg + db*db);
+        }
+    }
+
+    return -1.0f * sum;
 }
 
 void Phenotype::mutate()

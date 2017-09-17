@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
     SDL_Window* window = SDL_CreateWindow("Doodle", 0, 0, width * 2, height, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, image); // GPU memory
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 
     SDL_Rect dstrect = { 0, 0, width, height };
     SDL_RenderCopy(renderer, texture, NULL, &dstrect);
@@ -44,24 +45,25 @@ int main(int argc, char *argv[])
     GeneticOptimizer opt(image);
 
     // Main loop
-    uint64_t iterations = 0;
     SDL_Texture *progressTexture;
     bool running = true;
     while (running)
     {
         // Advance optimization
-        opt.step();
-        iterations++;
+        bool updated = opt.step();
         
-        // Show preview
-        progressTexture = SDL_CreateTextureFromSurface(renderer, opt.getCurrentBest());
-        SDL_Rect dstrect = { width, 0, width * 2, height };
-        SDL_RenderCopy(renderer, progressTexture, NULL, &dstrect);
-        SDL_RenderPresent(renderer);
-        SDL_DestroyTexture(progressTexture);
+        // Update preview
+        if (updated)
+        {
+            progressTexture = SDL_CreateTextureFromSurface(renderer, opt.getCurrentBest());
+            SDL_Rect dstrect = { width, 0, width * 2, height };
+            SDL_RenderFillRect(renderer, &dstrect);
+            SDL_RenderCopy(renderer, progressTexture, NULL, &dstrect);
+            SDL_RenderPresent(renderer);
+            SDL_DestroyTexture(progressTexture);
+        }
 
         // Poll events
-        SDL_Delay(200);
         SDL_Event event;
         SDL_PollEvent(&event);
         switch (event.type)

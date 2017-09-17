@@ -29,6 +29,7 @@ private:
     void drawCircle(int *genes);
 
     // N circles: x | y | R | r | g | b | a
+    int numCircles;
     std::vector<int> genotype; // the chromosomes of the individual
     SDL_Surface* data; // image produced by this individual's genotype
     SDL_Surface const* target;

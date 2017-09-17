@@ -1,4 +1,5 @@
 #pragma once
+#include <float.h>
 #include "SDL.h"
 
 /*
@@ -12,14 +13,14 @@ public:
     ~Optimizer();
 
     // Run optimizer for one iteration
-    virtual void step() = 0;
+    virtual bool step() = 0;
     
     // Poll (and eventually show) current progress
     SDL_Surface* getCurrentBest() { return currentBest; }
 
 protected:
-    int iterations;
     SDL_Surface* currentBest;
+    float currentBestFitness;
     SDL_Surface const* target; // target of omtimization
 };
 
