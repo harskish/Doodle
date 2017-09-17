@@ -45,12 +45,21 @@ int main(int argc, char *argv[])
 
     // Main loop
     uint64_t iterations = 0;
+    SDL_Texture *progressTexture;
     bool running = true;
     while (running)
     {
         // Advance optimization
         opt.step();
+        iterations++;
         
+        // Show preview
+        progressTexture = SDL_CreateTextureFromSurface(renderer, opt.getCurrentBest());
+        SDL_Rect dstrect = { width, 0, width * 2, height };
+        SDL_RenderCopy(renderer, progressTexture, NULL, &dstrect);
+        SDL_RenderPresent(renderer);
+        SDL_DestroyTexture(progressTexture);
+
         // Poll events
         SDL_Delay(200);
         SDL_Event event;

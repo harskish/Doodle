@@ -19,5 +19,9 @@ GeneticOptimizer::~GeneticOptimizer()
 void GeneticOptimizer::step()
 {
     std::cout << "[GeneticOptimizer] Performing step " << generation << std::endl;
+    individuals[0].mutate();
+    individuals[0].draw();
+    SDL_Surface* best = individuals[0].getImage();
+    this->currentBest = best;
     generation++;
 }

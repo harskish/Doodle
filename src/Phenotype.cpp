@@ -42,7 +42,7 @@ void Phenotype::randomInit()
 
         int posX = -w/2 + rand() % (2*w);
         int posY = -h/2 + rand() % (2*h);
-        int radius = rand() % std::max(w, h);
+        int radius = rand() % std::min(w, h);
         int r = rand() % 256;
         int g = rand() % 256;
         int b = rand() % 256;
@@ -50,4 +50,54 @@ void Phenotype::randomInit()
 
         genotype.insert(genotype.end(), { posX, posY, radius, r, g, b, a });
     }
+}
+
+void Phenotype::drawCircle(int *genes)
+{
+    int x = *genes++;
+    int y = *genes++;
+    int R = *genes++;
+    int r = *genes++;
+    int g = *genes++;
+    int b = *genes++;
+    int a = *genes++;
+
+    for (int w = 0; w < R * 2; w++)
+    {
+        for (int h = 0; h < R * 2; h++)
+        {
+            int dx = R - w; // horizontal offset
+            int dy = R - h; // vertical offset
+            if ((dx*dx + dy*dy) <= (R * R))
+            {
+                int xpos = x + dx;
+                int ypos = y + dy;
+                if (xpos > 0 && xpos < data->w && ypos > 0 && ypos < data->h)
+                {
+                    unsigned char* pixels = (unsigned char*)data->pixels;
+                    pixels[4 * (ypos * data->w + xpos) + 0] = (unsigned char)r;
+                    pixels[4 * (ypos * data->w + xpos) + 1] = (unsigned char)g;
+                    pixels[4 * (ypos * data->w + xpos) + 2] = (unsigned char)b;
+                    pixels[4 * (ypos * data->w + xpos) + 3] = (unsigned char)a;
+                }
+            }
+        }
+    }
+}
+
+void Phenotype::draw()
+{
+    drawCircle(genotype.data());
+}
+
+float Phenotype::fitness()
+{
+    return 0.0f;
+}
+
+void Phenotype::mutate()
+{
+    // TEST!
+    genotype.clear();
+    randomInit();
 }

@@ -21,8 +21,12 @@ public:
     void crossover(Phenotype &other);
     void mutate();
 
+    void draw();
+    SDL_Surface *getImage() { return data; }
+
 private:
     void randomInit();
+    void drawCircle(int *genes);
 
     // N circles: x | y | R | r | g | b | a
     std::vector<int> genotype; // the chromosomes of the individual
