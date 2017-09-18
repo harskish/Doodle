@@ -14,12 +14,19 @@ int main(int argc, char *argv[])
 
     atexit(SDL_Quit);
 
-    SDL_Surface* image = SDL_LoadBMP("mona_half.bmp"); // CPU memory
-    if (image == NULL)
+    SDL_Surface* tmp = SDL_LoadBMP("mona.bmp"); // CPU memory
+    if (tmp == NULL)
     {
         std::cout << "Unable to load image\n";
         return -1;
     }
+
+    // Force familiar format
+    SDL_Surface* image = surfaceWithEndian(tmp->w, tmp->h);
+    if (SDL_BlitSurface(tmp, NULL, image, NULL))
+        throw std::runtime_error("Faied to update current best solution");
+
+    SDL_FreeSurface(tmp);
 
     int width = image->w;
     int height = image->h;

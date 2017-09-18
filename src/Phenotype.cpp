@@ -4,7 +4,7 @@ Phenotype::Phenotype(SDL_Surface const* reference)
 {
     target = reference;
     data = surfaceWithEndian(target->w, target->h);
-    numCircles = 5;
+    numCircles = 15;
     randomInit();
 }
 
@@ -41,8 +41,8 @@ void Phenotype::randomInit()
         int w = target->w;
         int h = target->h;
 
-        int posX = -w/2 + rand() % (2*w);
-        int posY = -h/2 + rand() % (2*h);
+        int posX = -w / 2 + rand() % (2 * w);
+        int posY = -h / 2 + rand() % (2 * h);
         int radius = rand() % (std::min(w, h) / 2);
         int r = rand() % 256;
         int g = rand() % 256;
@@ -73,30 +73,19 @@ void Phenotype::drawCircle(int *genes)
             {
                 int xpos = x + dx;
                 int ypos = y + dy;
-                if (xpos > 0 && xpos < data->w && ypos > 0 && ypos < data->h)
+                if (xpos >= 0 && xpos < data->w && ypos >= 0 && ypos < data->h)
                 {
-                    Uint32 R, G, B;
+                    Uint8 RR, GG, BB, AA;
                     Uint32 *row = (Uint32 *)data->pixels + ypos * data->pitch / 4 + xpos;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-                    R = ((unsigned char *)row)[0];
-                    G = ((unsigned char *)row)[1];
-                    B = ((unsigned char *)row)[2];
-#else
-                    R = ((unsigned char *)row)[3];
-                    G = ((unsigned char *)row)[2];
-                    B = ((unsigned char *)row)[1];
-#endif           
-                    R = R * (255 - a) + r * a;
-                    G = G * (255 - a) + g * a;
-                    B = B * (255 - a) + b * a;
+                    SDL_GetRGBA(*row, data->format, &RR, &GG, &BB, &AA);           
+                    
+                    // Custom alpha blending
+                    Uint32 R = RR * (255 - a) + r * a;
+                    Uint32 G = GG * (255 - a) + g * a;
+                    Uint32 B = BB * (255 - a) + b * a;
                     Uint32 A = 255;
 
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-                    *row = ((R & 0xff00) << 16) | ((G & 0xff00) << 8) | (B & 0xff00) | A;
-#else
-                    *row = ((A & 0xff00) << 16) | ((B & 0xff00) << 8) | (G & 0xff00) | R;
-#endif
+                    *row = SDL_MapRGBA(data->format, R / 255, G / 255, B / 255, A);
                 }
             }
         }
@@ -105,7 +94,7 @@ void Phenotype::drawCircle(int *genes)
 
 void Phenotype::draw()
 {
-    SDL_FillRect(data, NULL, 0); // clear existing data
+    SDL_FillRect(data, NULL, SDL_MapRGBA(data->format, 0, 0, 0, 255)); // clear existing data
     int *ptr = genotype.data();
     for (int c = 0; c < numCircles; c++)
         drawCircle(ptr + c * 7);
@@ -119,17 +108,17 @@ float Phenotype::fitness()
     {
         for (int w = 0; w < data->w; w++)
         {
-            const unsigned char* src = (const unsigned char*)data->pixels;
-            const unsigned char* dst = (const unsigned char*)target->pixels;
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-            int dr = src[4 * (h * data->w + w) + 0] - dst[4 * (h * data->w + w) + 0];
-            int dg = src[4 * (h * data->w + w) + 1] - dst[4 * (h * data->w + w) + 1];
-            int db = src[4 * (h * data->w + w) + 2] - dst[4 * (h * data->w + w) + 2];
-#else
-            int dr = src[4 * (h * data->w + w) + 3] - dst[4 * (h * data->w + w) + 3];
-            int dg = src[4 * (h * data->w + w) + 2] - dst[4 * (h * data->w + w) + 2];
-            int db = src[4 * (h * data->w + w) + 1] - dst[4 * (h * data->w + w) + 1];
-#endif
+            Uint8 srcR, srcG, srcB, srcA, dstR, dstG, dstB, dstA;
+            Uint32 *pixelSrc = (Uint32*)data->pixels + h * data->w + w;
+            Uint32 *pixelDst = (Uint32*)target->pixels + h * target->w + w;
+            SDL_GetRGBA(*pixelSrc, data->format, &srcR, &srcG, &srcB, &srcA);
+            SDL_GetRGBA(*pixelDst, target->format, &dstR, &dstG, &dstB, &dstA);
+
+            int dr = (int)srcR - (int)dstR;
+            int dg = (int)srcG - (int)dstG;
+            int db = (int)srcB - (int)dstB;
+            int da = (int)srcA - (int)dstA;
+
             sum += (dr*dr + dg*dg + db*db);
         }
     }
