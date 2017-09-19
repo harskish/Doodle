@@ -5,6 +5,7 @@ Phenotype::Phenotype(SDL_Surface const* reference)
     target = reference;
     data = surfaceWithEndian(target->w, target->h);
     numCircles = 10;
+    dirty = true;
     randomInit();
 }
 
@@ -20,6 +21,8 @@ Phenotype& Phenotype::operator=(Phenotype const& other)
     fresh.numCircles = other.numCircles;
     if (SDL_BlitSurface(other.data, NULL, fresh.data, NULL))
         throw std::runtime_error("Failed to copy phenotype data");
+    fresh.fitnessValue = other.fitnessValue;
+    fresh.dirty = other.dirty;
     return fresh;
 }
 
@@ -31,6 +34,8 @@ Phenotype::Phenotype(Phenotype const& other)
     data = surfaceWithEndian(target->w, target->h);
     if (SDL_BlitSurface(other.data, NULL, data, NULL))
         throw std::runtime_error("Failed to copy phenotype data");
+    fitnessValue = other.fitnessValue;
+    dirty = other.dirty;
 }
 
 // Map [0,255] to [-w/2, 3w/2]
@@ -114,6 +119,13 @@ void Phenotype::draw()
 // Negative sum of squared distances
 float Phenotype::fitness()
 {
+    if (!dirty)
+        return fitnessValue;
+        
+    // Update internal image
+    draw();
+
+    // Compute fitness, cache result
     float sum = 0.0f;
     for (int h = 0; h < data->h; h++)
     {
@@ -137,7 +149,9 @@ float Phenotype::fitness()
     // Penalize adding unnecessary circles
     // sum += numCircles * 100;
 
-    return -1.0f * sum;
+    fitnessValue = -1.0f * sum;
+    dirty = false;
+    return fitnessValue;
 }
 
 void Phenotype::mutate()
@@ -146,6 +160,9 @@ void Phenotype::mutate()
     for (int g = 0; g < numCircles * genesPerCircle; g++)
     {
         if (rand() % 100 < mutationRate)
+        {
             genotype[g] = randGene();
+            dirty = true;
+        }
     }
 }

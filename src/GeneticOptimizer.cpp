@@ -14,7 +14,7 @@ GeneticOptimizer::GeneticOptimizer(SDL_Surface const *reference) : Optimizer(ref
 
 bool GeneticOptimizer::step()
 {
-    if (generation % 1000 == 0)
+    if (generation % 5000 == 0)
         std::cout << "[GeneticOptimizer] Generation " << generation << std::endl;
 
     std::vector<float> fitnesses(currentPopulation.size());
@@ -25,7 +25,6 @@ bool GeneticOptimizer::step()
     {
         Phenotype &p = nextPopulation[i];
         p.mutate();
-        p.draw(); // TODO: replace with dirty-flag
         fitnesses[i] = p.fitness();
     }
 
@@ -37,11 +36,15 @@ bool GeneticOptimizer::step()
     {
         SDL_Surface* best = nextPopulation[iBest].getImage();
         this->currentBestFitness = fBest;
-        currentPopulation = nextPopulation; // advance to next population
+        
+        // TEST: fill new population with clones of best individual
+        //currentPopulation = nextPopulation; // advance to next population
+        std::for_each(currentPopulation.begin(), currentPopulation.end(), [&](Phenotype &p) { p = nextPopulation[iBest]; });
+        
         if (SDL_BlitSurface(best, NULL, this->currentBest, NULL))
             throw std::runtime_error("Faied to update current best solution");
 
-        std::cout << "New best fitness: " << currentBestFitness << std::endl;
+        std::cout << "[GeneticOptimizer] New best fitness: " << currentBestFitness << std::endl;
         return true;
     }
     

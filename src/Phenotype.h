@@ -24,11 +24,11 @@ public:
     void crossover(Phenotype &other);
     void mutate();
 
-    void draw();
     SDL_Surface *getImage() { return data; }
 
 private:
     void randomInit();
+    void draw();
     void drawCircle(Gene *genes);
 
     int geneToX(Gene g);
@@ -41,4 +41,6 @@ private:
     std::vector<Gene> genotype; // the genes of the individual
     SDL_Surface* data; // image produced by this individual's genotype
     SDL_Surface const* target;
+    float fitnessValue; // cached fitness value
+    bool dirty; // is fitness value up to date?
 };

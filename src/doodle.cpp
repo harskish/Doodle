@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 
     atexit(SDL_Quit);
 
-    SDL_Surface* tmp = SDL_LoadBMP("green-200.bmp"); // CPU memory
+    SDL_Surface* tmp = SDL_LoadBMP("mona_half.bmp"); // CPU memory
     if (tmp == NULL)
     {
         std::cout << "Unable to load image\n";
@@ -28,8 +28,9 @@ int main(int argc, char *argv[])
 
     SDL_FreeSurface(tmp);
 
-    int width = image->w;
-    int height = image->h;
+    int scale = 2;
+    int width = image->w * scale;
+    int height = image->h * scale;
 
     SDL_Window* window = SDL_CreateWindow("Doodle", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width * 2, height, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
