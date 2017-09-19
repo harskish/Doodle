@@ -10,7 +10,7 @@ class GeneticOptimizer : public Optimizer
 {
 public:
     GeneticOptimizer(SDL_Surface const *reference);
-    ~GeneticOptimizer();
+    ~GeneticOptimizer() = default;
 
     virtual bool step();
 
@@ -19,6 +19,7 @@ private:
     int populationSize;
 
     // Population
-    std::vector<Phenotype> individuals;
+    std::vector<Phenotype> currentPopulation;
+    std::vector<Phenotype> nextPopulation;
 };
 

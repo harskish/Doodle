@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 
     atexit(SDL_Quit);
 
-    SDL_Surface* tmp = SDL_LoadBMP("lena_half.bmp"); // CPU memory
+    SDL_Surface* tmp = SDL_LoadBMP("green-200.bmp"); // CPU memory
     if (tmp == NULL)
     {
         std::cout << "Unable to load image\n";

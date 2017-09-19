@@ -9,6 +9,7 @@
     A phenotype (an individual) in an evolutionary algorithm
 */
 typedef uint8_t Gene;
+inline Gene randGene() { return (Gene)(rand() % 256); }
 
 class Phenotype
 {

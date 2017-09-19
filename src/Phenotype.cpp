@@ -33,21 +33,27 @@ Phenotype::Phenotype(Phenotype const& other)
         throw std::runtime_error("Failed to copy phenotype data");
 }
 
+// Map [0,255] to [-w/2, 3w/2]
 inline int Phenotype::geneToX(Gene g)
 {
     int w = data->w;
     int x = -w / 2 + g * (2 * w) / 255;
     return x;
 }
+
+// Map [0,255] to [-h/2, 3h/2]
 inline int Phenotype::geneToY(Gene g)
 {
     int h = data->h;
     int y = -h / 2 + g * (2 * h) / 255;
     return y;
 }
+
+// Map [0,255] to [0, min(w,h)/k]
 inline int Phenotype::geneToRadius(Gene g)
 {
-    int R = g * std::min(data->w, data->h) / (4 * 255);
+    const int k = 1;
+    int R = g * std::min(data->w, data->h) / (k * 255);
     return R;
 }
 
@@ -55,7 +61,7 @@ inline int Phenotype::geneToRadius(Gene g)
 void Phenotype::randomInit()
 {
     genotype.resize(numCircles * genesPerCircle);
-    std::for_each(genotype.begin(), genotype.end(), [&](Gene &g) { g = (Gene)(rand() % 256); });
+    std::for_each(genotype.begin(), genotype.end(), [&](Gene &g) { g = randGene(); });
 }
 
 void Phenotype::drawCircle(Gene *genes)
@@ -128,11 +134,18 @@ float Phenotype::fitness()
         }
     }
 
+    // Penalize adding unnecessary circles
+    // sum += numCircles * 100;
+
     return -1.0f * sum;
 }
 
 void Phenotype::mutate()
 {
-    // TEST!
-    randomInit();
+    const int mutationRate = 10; // percent
+    for (int g = 0; g < numCircles * genesPerCircle; g++)
+    {
+        if (rand() % 100 < mutationRate)
+            genotype[g] = randGene();
+    }
 }
