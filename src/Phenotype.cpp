@@ -4,7 +4,7 @@ Phenotype::Phenotype(SDL_Surface const* reference)
 {
     target = reference;
     data = surfaceWithEndian(target->w, target->h);
-    numCircles = 15;
+    numCircles = 10;
     randomInit();
 }
 
@@ -33,35 +33,40 @@ Phenotype::Phenotype(Phenotype const& other)
         throw std::runtime_error("Failed to copy phenotype data");
 }
 
-void Phenotype::randomInit()
+inline int Phenotype::geneToX(Gene g)
 {
-    for (int i = 0; i < numCircles; i++)
-    {
-        // TODO: normalize chromosomes to be in range [0,255]?
-        int w = target->w;
-        int h = target->h;
-
-        int posX = -w / 2 + rand() % (2 * w);
-        int posY = -h / 2 + rand() % (2 * h);
-        int radius = rand() % (std::min(w, h) / 2);
-        int r = rand() % 256;
-        int g = rand() % 256;
-        int b = rand() % 256;
-        int a = rand() % 256;
-
-        genotype.insert(genotype.end(), { posX, posY, radius, r, g, b, a });
-    }
+    int w = data->w;
+    int x = -w / 2 + g * (2 * w) / 255;
+    return x;
+}
+inline int Phenotype::geneToY(Gene g)
+{
+    int h = data->h;
+    int y = -h / 2 + g * (2 * h) / 255;
+    return y;
+}
+inline int Phenotype::geneToRadius(Gene g)
+{
+    int R = g * std::min(data->w, data->h) / (4 * 255);
+    return R;
 }
 
-void Phenotype::drawCircle(int *genes)
+// Chromosomes normalized into range [0,255], corresponding physical quantities scaled
+void Phenotype::randomInit()
 {
-    int x = *genes++;
-    int y = *genes++;
-    int R = *genes++;
+    genotype.resize(numCircles * genesPerCircle);
+    std::for_each(genotype.begin(), genotype.end(), [&](Gene &g) { g = (Gene)(rand() % 256); });
+}
+
+void Phenotype::drawCircle(Gene *genes)
+{
+    int x = geneToX(*genes++);
+    int y = geneToY(*genes++);
+    int R = geneToRadius(*genes++);
     Uint32 r = (Uint32)*genes++;
     Uint32 g = (Uint32)*genes++;
     Uint32 b = (Uint32)*genes++;
-    uint8_t a = (uint8_t)*genes++;
+    Uint8 a = (Uint8)*genes++;
 
     for (int h = 0; h < R * 2; h++)
     {
@@ -76,7 +81,7 @@ void Phenotype::drawCircle(int *genes)
                 if (xpos >= 0 && xpos < data->w && ypos >= 0 && ypos < data->h)
                 {
                     Uint8 RR, GG, BB, AA;
-                    Uint32 *row = (Uint32 *)data->pixels + ypos * data->pitch / 4 + xpos;
+                    Uint32 *row = (Uint32 *)data->pixels + ypos * data->w + xpos;
                     SDL_GetRGBA(*row, data->format, &RR, &GG, &BB, &AA);           
                     
                     // Custom alpha blending
@@ -95,9 +100,9 @@ void Phenotype::drawCircle(int *genes)
 void Phenotype::draw()
 {
     SDL_FillRect(data, NULL, SDL_MapRGBA(data->format, 0, 0, 0, 255)); // clear existing data
-    int *ptr = genotype.data();
+    Gene *ptr = genotype.data();
     for (int c = 0; c < numCircles; c++)
-        drawCircle(ptr + c * 7);
+        drawCircle(ptr + c * genesPerCircle);
 }
 
 // Negative sum of squared distances
@@ -129,6 +134,5 @@ float Phenotype::fitness()
 void Phenotype::mutate()
 {
     // TEST!
-    genotype.clear();
     randomInit();
 }
