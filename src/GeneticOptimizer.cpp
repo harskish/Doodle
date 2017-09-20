@@ -4,7 +4,7 @@
 GeneticOptimizer::GeneticOptimizer(SDL_Surface const *reference) : Optimizer(reference)
 {
     generation = 0;
-    populationSize = 4;
+    populationSize = 8;
     stepsWithoutImprovement = 0;
 
     for (int i = 0; i < populationSize; i++) {
@@ -51,12 +51,12 @@ bool GeneticOptimizer::step()
     }
     else {
         stepsWithoutImprovement++;
-        if (stepsWithoutImprovement > 1000)
+        /*if (stepsWithoutImprovement > 3000)
         {
             std::for_each(currentPopulation.begin(), currentPopulation.end(), [&](Phenotype &p) { p.addCircle(); });
-            std::cout << "[GeneticOptimizer] Adding circles (" << currentPopulation[0].getNumCircles() << ")" << std::endl;
+            std::cout << "[GeneticOptimizer] Adding circle (now " << currentPopulation[0].getNumCircles() << ")" << std::endl;
             stepsWithoutImprovement = 0;
-        }
+        }*/
     }
     
     return false;

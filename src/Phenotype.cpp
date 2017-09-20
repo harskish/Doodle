@@ -145,7 +145,7 @@ float Phenotype::fitness()
     }
 
     // Penalize adding unnecessary circles
-    // sum += numCircles * 100;
+    sum += numCircles;
 
     fitnessValue = -1.0f * sum;
     dirty = false;
@@ -214,8 +214,38 @@ void Phenotype::mutate()
         return true;
     };
 
+    auto addCircleMutation = [&](std::vector<Gene> &genotype) -> bool
+    {
+        const int mutationRate = 15; // percent
+        if (rand() % 100 < mutationRate)
+        {
+            addCircle();
+            return true;
+        }
+
+        return false;
+    };
+
+    auto removeCircleMutation = [&](std::vector<Gene> &genotype) -> bool
+    {
+        if (numCircles == 1) return false;
+
+        const int mutationRate = 15; // percent
+        if (rand() % 100 < mutationRate)
+        {
+            auto it = genotype.begin() + (rand() % numCircles) * genesPerCircle;
+            genotype.erase(it, it + genesPerCircle);
+            numCircles--;
+            return true;
+        }
+
+        return false;
+    };
+
     // Perform mutations
     dirty |= randomMutation(genotype);
     dirty |= perturbationMutation(genotype);
     dirty |= shuffleMutation(genotype);
+    dirty |= addCircleMutation(genotype);
+    dirty |= removeCircleMutation(genotype);
 }
