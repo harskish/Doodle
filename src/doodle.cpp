@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
     }
 
     atexit(SDL_Quit);
+    //SDL_GL_SetSwapInterval(0); // disable double buffered vsync
 
     SDL_Surface* tmp = SDL_LoadBMP("mona_half.bmp"); // CPU memory
     if (tmp == NULL)
@@ -56,9 +57,10 @@ int main(int argc, char *argv[])
         if (updated)
         {   
             progressTexture = SDL_CreateTextureFromSurface(renderer, opt.getCurrentBest());
-            SDL_Rect dstrect = { width, 0, width, height }; // x, y, w, h
-            SDL_RenderFillRect(renderer, &dstrect);
-            SDL_RenderCopy(renderer, progressTexture, NULL, &dstrect);
+            SDL_Rect rect = { width, 0, width, height }; // x, y, w, h
+            SDL_RenderClear(renderer);
+            SDL_RenderCopy(renderer, progressTexture, NULL, &rect); // current
+            SDL_RenderCopy(renderer, texture, NULL, &dstrect); // reference
             SDL_RenderPresent(renderer);
             SDL_DestroyTexture(progressTexture);
         }
