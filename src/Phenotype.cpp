@@ -16,14 +16,13 @@ Phenotype::~Phenotype()
 
 Phenotype& Phenotype::operator=(Phenotype const& other)
 {
-    Phenotype fresh(other.target);
-    fresh.genotype = other.genotype;
-    fresh.numCircles = other.numCircles;
-    if (SDL_BlitSurface(other.data, NULL, fresh.data, NULL))
+    genotype = other.genotype;
+    numCircles = other.numCircles;
+    if (SDL_BlitSurface(other.data, NULL, data, NULL))
         throw std::runtime_error("Failed to copy phenotype data");
-    fresh.fitnessValue = other.fitnessValue;
-    fresh.dirty = other.dirty;
-    return fresh;
+    fitnessValue = other.fitnessValue;
+    dirty = other.dirty;
+    return *this;
 }
 
 Phenotype::Phenotype(Phenotype const& other)
@@ -140,7 +139,6 @@ float Phenotype::fitness()
             int dr = (int)srcR - (int)dstR;
             int dg = (int)srcG - (int)dstG;
             int db = (int)srcB - (int)dstB;
-            int da = (int)srcA - (int)dstA;
 
             sum += (dr*dr + dg*dg + db*db);
         }
