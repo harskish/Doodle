@@ -17,6 +17,7 @@ public:
 private:
     int generation;
     int populationSize;
+    int stepsWithoutImprovement;
 
     // Population
     std::vector<Phenotype> currentPopulation;

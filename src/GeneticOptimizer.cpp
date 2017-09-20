@@ -5,6 +5,7 @@ GeneticOptimizer::GeneticOptimizer(SDL_Surface const *reference) : Optimizer(ref
 {
     generation = 0;
     populationSize = 4;
+    stepsWithoutImprovement = 0;
 
     for (int i = 0; i < populationSize; i++) {
         currentPopulation.push_back(Phenotype(reference));
@@ -34,6 +35,7 @@ bool GeneticOptimizer::step()
     float fBest = fitnesses[iBest];
     if (fBest > currentBestFitness)
     {
+        stepsWithoutImprovement = 0;
         SDL_Surface* best = nextPopulation[iBest].getImage();
         this->currentBestFitness = fBest;
         
@@ -42,10 +44,19 @@ bool GeneticOptimizer::step()
         std::for_each(currentPopulation.begin(), currentPopulation.end(), [&](Phenotype &p) { p = nextPopulation[iBest]; });
         
         if (SDL_BlitSurface(best, NULL, this->currentBest, NULL))
-            throw std::runtime_error("Faied to update current best solution");
+            throw std::runtime_error("Failed to update current best solution");
 
-        std::cout << "[GeneticOptimizer] New best fitness: " << currentBestFitness << std::endl;
+        //std::cout << "[GeneticOptimizer] New best fitness: " << currentBestFitness << std::endl;
         return true;
+    }
+    else {
+        stepsWithoutImprovement++;
+        if (stepsWithoutImprovement > 1000)
+        {
+            std::for_each(currentPopulation.begin(), currentPopulation.end(), [&](Phenotype &p) { p.addCircle(); });
+            std::cout << "[GeneticOptimizer] Adding circles (" << currentPopulation[0].getNumCircles() << ")" << std::endl;
+            stepsWithoutImprovement = 0;
+        }
     }
     
     return false;

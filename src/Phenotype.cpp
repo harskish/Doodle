@@ -4,7 +4,7 @@ Phenotype::Phenotype(SDL_Surface const* reference)
 {
     target = reference;
     data = surfaceWithEndian(target->w, target->h);
-    numCircles = 10;
+    numCircles = 1;
     dirty = true;
     randomInit();
 }
@@ -152,15 +152,70 @@ float Phenotype::fitness()
     return fitnessValue;
 }
 
+void Phenotype::addCircle()
+{
+    numCircles++;
+    for(int i = 0; i < genesPerCircle; i++)
+    {
+        genotype.push_back(randGene());
+    }
+    dirty = true;
+}
+
 void Phenotype::mutate()
 {
-    const int mutationRate = 10; // percent
-    for (int g = 0; g < numCircles * genesPerCircle; g++)
+    auto randomMutation = [&](std::vector<Gene> &genotype) -> bool
     {
-        if (rand() % 100 < mutationRate)
+        bool mutated = false;
+
+        const int mutationRate = 5; // percent
+        for (int g = 0; g < numCircles * genesPerCircle; g++)
         {
-            genotype[g] = randGene();
-            dirty = true;
+            if (rand() % 100 < mutationRate)
+            {
+                genotype[g] = randGene();
+                mutated = true;
+            }
         }
-    }
+
+        return mutated;
+    };
+
+    auto perturbationMutation = [&](std::vector<Gene> &genotype) -> bool
+    {
+        bool mutated = false;
+
+        const int mutationRate = 10; // percent
+        for (int g = 0; g < numCircles * genesPerCircle; g++)
+        {
+            if (rand() % 100 < mutationRate)
+            {
+                genotype[g] += (-10 + rand() % 21);
+                mutated = true;
+            }
+        }
+
+        return mutated;
+    };
+
+    auto shuffleMutation = [&](std::vector<Gene> &genotype) -> bool
+    {
+        if (numCircles == 1) return false;
+
+        int idx1, idx2;
+        idx1 = rand() % numCircles;
+        while((idx2 = rand() % numCircles) == idx1);
+
+        for(int g = 0; g < genesPerCircle; g++)
+        {
+            std::swap(genotype[idx1 * genesPerCircle + g], genotype[idx2 * genesPerCircle + g]);
+        }
+
+        return true;
+    };
+
+    // Perform mutations
+    dirty |= randomMutation(genotype);
+    dirty |= perturbationMutation(genotype);
+    dirty |= shuffleMutation(genotype);
 }

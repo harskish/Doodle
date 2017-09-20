@@ -23,8 +23,10 @@ public:
     float fitness();
     void crossover(Phenotype &other);
     void mutate();
+    void addCircle();
 
     SDL_Surface *getImage() { return data; }
+    int getNumCircles() { return numCircles; }
 
 private:
     void randomInit();
