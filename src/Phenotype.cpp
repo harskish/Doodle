@@ -115,7 +115,7 @@ void Phenotype::draw()
         drawCircle(ptr + c * genesPerCircle);
 }
 
-// Negative sum of squared distances
+// Positive fitness value
 float Phenotype::fitness()
 {
     if (!dirty)
@@ -125,7 +125,8 @@ float Phenotype::fitness()
     draw();
 
     // Compute fitness, cache result
-    float sum = 0.0f;
+    unsigned long upperBound = (3 * 255 * 255) * data->w * data->h;
+    float sum = (float)upperBound;
     for (int h = 0; h < data->h; h++)
     {
         for (int w = 0; w < data->w; w++)
@@ -140,14 +141,14 @@ float Phenotype::fitness()
             int dg = (int)srcG - (int)dstG;
             int db = (int)srcB - (int)dstB;
 
-            sum += (dr*dr + dg*dg + db*db);
+            sum -= (dr*dr + dg*dg + db*db);
         }
     }
 
     // Penalize adding unnecessary circles
-    sum += numCircles;
+    sum -= numCircles;
 
-    fitnessValue = -1.0f * sum;
+    fitnessValue = sum;
     dirty = false;
     return fitnessValue;
 }
@@ -160,6 +161,17 @@ void Phenotype::addCircle()
         genotype.push_back(randGene());
     }
     dirty = true;
+}
+
+void Phenotype::crossover(Phenotype &other)
+{
+    const int pCrossover = 30;
+    if (rand() % 100 < pCrossover)
+    {
+        // Do something!
+        // dirty = true;
+        // other.dirty = true;
+    }
 }
 
 void Phenotype::mutate()

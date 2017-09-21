@@ -15,12 +15,13 @@ public:
     bool step();
 
 private:
+    Phenotype &selectParent(std::vector<std::pair<int, float>> &cdf);
+
     int generation;
     int populationSize;
     int stepsWithoutImprovement;
 
     // Population
     std::vector<Phenotype> currentPopulation;
-    std::vector<Phenotype> nextPopulation;
 };
 
