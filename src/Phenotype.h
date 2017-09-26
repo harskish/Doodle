@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <set>
 #include "SDL.h"
 #include "Utils.h"
 

@@ -4,7 +4,7 @@
 GeneticOptimizer::GeneticOptimizer(SDL_Surface const *reference) : Optimizer(reference)
 {
     generation = 0;
-    populationSize = 32;
+    populationSize = 128;
     stepsWithoutImprovement = 0;
 
     for (int i = 0; i < populationSize; i++) {

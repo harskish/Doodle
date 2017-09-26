@@ -165,12 +165,41 @@ void Phenotype::addCircle()
 
 void Phenotype::crossover(Phenotype &other)
 {
-    const int pCrossover = 30;
+    const int pCrossover = 50;
     if (rand() % 100 < pCrossover)
     {
-        // Do something!
-        // dirty = true;
-        // other.dirty = true;
+        const int numSegments = 3;
+        std::set<int> indexSet;
+
+        const int minLen = std::min(this->genotype.size(), other.genotype.size());
+        while (indexSet.size() < numSegments - 1)
+        {
+            indexSet.insert(rand() % (minLen - 1) + 1); // exclude 0
+        }
+
+        std::vector<int> indices(indexSet.begin(), indexSet.end());
+        indices.push_back(minLen); // end of last segment (if N even)
+
+        // Parent 1: aaaaa|bbbb|cc
+        // Parent 2: ddddd|eeee|ff
+        // Child 1:  aaaaa|eeee|cc
+        // Child 2:  ddddd|bbbb|ff
+        // => middle portion swapped
+
+        // Every second segment swapped (N >= 2 segments)
+        for (int seg = 1; seg < numSegments; seg += 2)
+        {
+            int s = indices[seg - 1];
+            int e = indices[seg];
+
+            for (int i = s; i < e; i++)
+            {
+                std::swap(this->genotype[i], other.genotype[i]);
+            }
+        }
+
+        dirty = true;
+        other.dirty = true;
     }
 }
 
