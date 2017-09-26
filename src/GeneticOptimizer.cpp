@@ -4,7 +4,7 @@
 GeneticOptimizer::GeneticOptimizer(SDL_Surface const *reference) : Optimizer(reference)
 {
     generation = 0;
-    populationSize = 4;
+    populationSize = 32;
     stepsWithoutImprovement = 0;
 
     for (int i = 0; i < populationSize; i++) {
@@ -31,21 +31,14 @@ Phenotype& GeneticOptimizer::selectParent(std::vector<std::pair<int, float>> &cd
     return currentPopulation[idx];
 }
 
-bool GeneticOptimizer::step()
+std::vector<std::pair<int, float>> GeneticOptimizer::getFitnesses(std::vector<Phenotype> &population)
 {
-    if (generation % 5000 == 0)
-        std::cout << "[GeneticOptimizer] Generation " << generation << std::endl;
+    std::vector<std::pair<int, float>> fitnesses(population.size());
 
-    // Return value of function
-    bool newBestFound = false;
-
-    // Evaluate fitness of population
-    std::vector<std::pair<int, float>> fitnesses(currentPopulation.size());
-    
     #pragma omp parallel for schedule(dynamic)
-    for (int i = 0; i < currentPopulation.size(); i++)
+    for (int i = 0; i < population.size(); i++)
     {
-        Phenotype &p = currentPopulation[i];
+        Phenotype &p = population[i];
         fitnesses[i] = std::make_pair(i, p.fitness());
     }
 
@@ -54,6 +47,52 @@ bool GeneticOptimizer::step()
     {
         return f1.second > f2.second;
     });
+
+    return fitnesses; // NRVO
+}
+
+// Not correct from an algorithmic standpoint, but cool for visualizations
+bool GeneticOptimizer::stepForceAscent()
+{
+    // Build next generation by cloning and mutation
+    std::vector<Phenotype> nextPopulation = currentPopulation;
+    
+    // Make mutations
+    std::for_each(nextPopulation.begin(), nextPopulation.end(), [](Phenotype &p) { p.mutate(); });
+    generation++;
+
+    // Update fitnesses
+    auto fitnesses = getFitnesses(nextPopulation);
+    int iBest = fitnesses.front().first;
+    float fBest = fitnesses.front().second;
+
+    // Force ascent: only update if fitness improved
+    if (fBest > currentBestFitness)
+    {
+        stepsWithoutImprovement = 0;
+        SDL_Surface* best = currentPopulation[iBest].getImage();
+        this->currentBestFitness = fBest;
+
+        if (SDL_BlitSurface(best, NULL, this->currentBest, NULL))
+            throw std::runtime_error("Failed to update current best solution");
+
+        // Clone current best into next generation
+        std::for_each(currentPopulation.begin(), currentPopulation.end(), [&](Phenotype &p) { p = nextPopulation[iBest]; });
+        return true;
+    }
+
+    stepsWithoutImprovement++;
+    return false;
+}
+
+// Proper genetic algorithm
+bool GeneticOptimizer::stepProper()
+{
+    // Return value of function
+    bool newBestFound = false;
+
+    // Evaluate fitness of population
+    std::vector<std::pair<int, float>> fitnesses = getFitnesses(currentPopulation);
 
     // Check if preview needs to be updated
     int iBest = fitnesses.front().first;
@@ -67,17 +106,10 @@ bool GeneticOptimizer::step()
         if (SDL_BlitSurface(best, NULL, this->currentBest, NULL))
             throw std::runtime_error("Failed to update current best solution");
 
-        //std::cout << "[GeneticOptimizer] New best fitness: " << currentBestFitness << std::endl;
         newBestFound = true;
     }
     else {
         stepsWithoutImprovement++;
-        /*if (stepsWithoutImprovement > 1000)
-        {
-            std::for_each(currentPopulation.begin(), currentPopulation.end(), [&](Phenotype &p) { p.addCircle(); });
-            std::cout << "[GeneticOptimizer] Adding circle (now " << currentPopulation[0].getNumCircles() << ")" << std::endl;
-            stepsWithoutImprovement = 0;
-        }*/
     }
 
     // Build fitness pdf
@@ -96,9 +128,9 @@ bool GeneticOptimizer::step()
 
     // Build next generation by selection
     std::vector<Phenotype> nextPopulation;
-    while(nextPopulation.size() < currentPopulation.size())
+    while (nextPopulation.size() < currentPopulation.size())
     {
-        // Select two parents stochastically, make copies
+        // Roulette wheel selection, make copies
         Phenotype p1 = selectParent(fitnessCdf);
         Phenotype p2 = selectParent(fitnessCdf);
 
@@ -116,6 +148,19 @@ bool GeneticOptimizer::step()
 
     // Replace previous generation
     currentPopulation = nextPopulation;
+
     generation++;
     return newBestFound;
+}
+
+bool GeneticOptimizer::step()
+{
+    if (generation % 5000 == 0)
+        std::cout << "[GeneticOptimizer] Generation " << generation << std::endl;
+
+    constexpr bool forceAscentMode = false; // less correct, but cool for visualzation
+    if (forceAscentMode)
+        return stepForceAscent();
+    else
+        return stepProper();
 }

@@ -16,6 +16,10 @@ public:
 
 private:
     Phenotype &selectParent(std::vector<std::pair<int, float>> &cdf);
+    std::vector<std::pair<int, float>> getFitnesses(std::vector<Phenotype> &population);
+
+    bool stepProper();
+    bool stepForceAscent();
 
     int generation;
     int populationSize;

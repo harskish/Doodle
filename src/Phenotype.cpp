@@ -214,6 +214,9 @@ void Phenotype::mutate()
     {
         if (numCircles == 1) return false;
 
+        const int mutationRate = 15; 
+        if (rand() % 100 >= mutationRate) return false;
+
         int idx1, idx2;
         idx1 = rand() % numCircles;
         while((idx2 = rand() % numCircles) == idx1);
@@ -228,7 +231,7 @@ void Phenotype::mutate()
 
     auto addCircleMutation = [&](std::vector<Gene> &genotype) -> bool
     {
-        const int mutationRate = 15; // percent
+        const int mutationRate = 5; // percent
         if (rand() % 100 < mutationRate)
         {
             addCircle();
@@ -242,7 +245,7 @@ void Phenotype::mutate()
     {
         if (numCircles == 1) return false;
 
-        const int mutationRate = 15; // percent
+        const int mutationRate = 10; // percent
         if (rand() % 100 < mutationRate)
         {
             auto it = genotype.begin() + (rand() % numCircles) * genesPerCircle;
