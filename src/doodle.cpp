@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
 
     // Initialize optimizer
     GeneticOptimizer opt(image);
+    srand((unsigned int)time(NULL));
 
     // Main loop
     SDL_Texture *progressTexture;

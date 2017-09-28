@@ -50,10 +50,10 @@ private:
     // Genetic operator probabilities
     struct
     {
-        int crossover = 5;
+        int crossover = 10;
         int random = 5;
-        int shuffle = 10;
-        int addCircle = 25;
+        int shuffle = 5;
+        int addCircle = 10;
         int removeCircle = 10;
         int perturbation = 30;
     } probs;

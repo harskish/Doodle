@@ -6,6 +6,7 @@ GeneticOptimizer::GeneticOptimizer(SDL_Surface const *reference) : Optimizer(ref
     generation = 0;
     populationSize = 64;
     stepsWithoutImprovement = 0;
+    currentBestFitness = 0.0;
 
     for (int i = 0; i < populationSize; i++) {
         currentPopulation.push_back(Phenotype(reference));
@@ -67,10 +68,11 @@ bool GeneticOptimizer::stepForceAscent()
     double fBest = fitnesses.front().second;
 
     // Force ascent: only update if fitness improved
-    if (fBest > currentBestFitness)
+    if (fBest > bestSeenFitness)
     {
         stepsWithoutImprovement = 0;
         SDL_Surface* best = currentPopulation[iBest].getImage();
+        this->bestSeenFitness = fBest;
         this->currentBestFitness = fBest;
 
         if (SDL_BlitSurface(best, NULL, this->currentBest, NULL))
@@ -97,11 +99,12 @@ bool GeneticOptimizer::stepProper()
     // Check if preview needs to be updated
     int iBest = fitnesses.front().first;
     double fBest = fitnesses.front().second;
-    if (fBest > currentBestFitness)
+    currentBestFitness = fBest;
+    if (fBest > bestSeenFitness)
     {
         stepsWithoutImprovement = 0;
         SDL_Surface* best = currentPopulation[iBest].getImage();
-        this->currentBestFitness = fBest;
+        this->bestSeenFitness = fBest;
 
         if (SDL_BlitSurface(best, NULL, this->currentBest, NULL))
             throw std::runtime_error("Failed to update current best solution");
@@ -147,16 +150,26 @@ bool GeneticOptimizer::stepProper()
     }
 
     // Replace previous generation
-    currentPopulation = nextPopulation;
+    const bool forceAscent = false;
+    if (!forceAscent || getFitnesses(nextPopulation).front().second > bestSeenFitness)
+        currentPopulation = nextPopulation;
 
     generation++;
     return newBestFound;
 }
 
+void GeneticOptimizer::printStats()
+{
+    auto fitnessPercentage = [&](double f){ return 100 * f / (255UL * 255UL * 3UL * target->w * target->h); };
+
+    printf("[GeneticOptimizer] Generation: %d, fitness: %f%% (best: %f%%)\n",
+           generation, fitnessPercentage(currentBestFitness), fitnessPercentage(bestSeenFitness));
+}
+
 bool GeneticOptimizer::step()
 {
-    if (generation % 5000 == 0)
-        std::cout << "[GeneticOptimizer] Generation " << generation << std::endl;
+    if (generation % 50 == 0)
+        printStats();
 
     constexpr bool forceAscentMode = false; // less correct, but cool for visualzation
     if (forceAscentMode)

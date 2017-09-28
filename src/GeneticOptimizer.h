@@ -21,9 +21,13 @@ private:
     bool stepProper();
     bool stepForceAscent();
 
+    void printStats();
+
     int generation;
     int populationSize;
     int stepsWithoutImprovement;
+
+    double currentBestFitness; // of current population
 
     // Population
     std::vector<Phenotype> currentPopulation;

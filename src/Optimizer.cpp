@@ -5,7 +5,7 @@ Optimizer::Optimizer(SDL_Surface const *reference)
 {
     target = reference;
     currentBest = surfaceWithEndian(target->w, target->h);
-    currentBestFitness = 0.0;
+    bestSeenFitness = 0.0;
 }
 
 

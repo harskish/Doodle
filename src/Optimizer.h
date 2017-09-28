@@ -20,7 +20,7 @@ public:
 
 protected:
     SDL_Surface* currentBest;
-    double currentBestFitness;
+    double bestSeenFitness;
     SDL_Surface const* target; // target of omtimization
 };
 
