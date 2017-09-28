@@ -125,7 +125,7 @@ double Phenotype::fitness()
     draw();
 
     // Compute fitness, cache result
-    unsigned long upperBound = (3 * 255 * 255) * data->w * data->h;
+    unsigned long upperBound = (3UL * 255UL * 255UL) * data->w * data->h;
     unsigned long sum = upperBound;
     for (int h = 0; h < data->h; h++)
     {
