@@ -116,7 +116,7 @@ void Phenotype::draw()
 }
 
 // Positive fitness value
-float Phenotype::fitness()
+double Phenotype::fitness()
 {
     if (!dirty)
         return fitnessValue;
@@ -126,7 +126,7 @@ float Phenotype::fitness()
 
     // Compute fitness, cache result
     unsigned long upperBound = (3 * 255 * 255) * data->w * data->h;
-    float sum = (float)upperBound;
+    unsigned long sum = upperBound;
     for (int h = 0; h < data->h; h++)
     {
         for (int w = 0; w < data->w; w++)
@@ -148,7 +148,7 @@ float Phenotype::fitness()
     // Penalize adding unnecessary circles
     sum -= numCircles;
 
-    fitnessValue = sum;
+    fitnessValue = (double)sum;
     dirty = false;
     return fitnessValue;
 }

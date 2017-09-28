@@ -21,7 +21,7 @@ public:
     Phenotype& operator=(Phenotype const&);
     Phenotype(Phenotype const&);
 
-    float fitness();
+    double fitness();
     void crossover(Phenotype &other);
     void mutate();
     void addCircle();
@@ -44,6 +44,6 @@ private:
     std::vector<Gene> genotype; // the genes of the individual
     SDL_Surface* data; // image produced by this individual's genotype
     SDL_Surface const* target;
-    float fitnessValue; // cached fitness value
+    double fitnessValue; // cached fitness value
     bool dirty; // is fitness value up to date?
 };

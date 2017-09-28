@@ -15,8 +15,8 @@ public:
     bool step();
 
 private:
-    Phenotype &selectParent(std::vector<std::pair<int, float>> &cdf);
-    std::vector<std::pair<int, float>> getFitnesses(std::vector<Phenotype> &population);
+    Phenotype &selectParent(std::vector<std::pair<int, double>> &cdf);
+    std::vector<std::pair<int, double>> getFitnesses(std::vector<Phenotype> &population);
 
     bool stepProper();
     bool stepForceAscent();

@@ -4,7 +4,7 @@
 GeneticOptimizer::GeneticOptimizer(SDL_Surface const *reference) : Optimizer(reference)
 {
     generation = 0;
-    populationSize = 128;
+    populationSize = 64;
     stepsWithoutImprovement = 0;
 
     for (int i = 0; i < populationSize; i++) {
@@ -14,9 +14,9 @@ GeneticOptimizer::GeneticOptimizer(SDL_Surface const *reference) : Optimizer(ref
 
 
 // Sample parents proportional to their fitnesses (using fitness cdf)
-Phenotype& GeneticOptimizer::selectParent(std::vector<std::pair<int, float>> &cdf)
+Phenotype& GeneticOptimizer::selectParent(std::vector<std::pair<int, double>> &cdf)
 {
-    float r1 = rand() / (float)RAND_MAX;
+    double r1 = rand() / (double)RAND_MAX;
     int idx = 0;
 
     for (int i = 0; i < cdf.size(); i++)
@@ -31,9 +31,9 @@ Phenotype& GeneticOptimizer::selectParent(std::vector<std::pair<int, float>> &cd
     return currentPopulation[idx];
 }
 
-std::vector<std::pair<int, float>> GeneticOptimizer::getFitnesses(std::vector<Phenotype> &population)
+std::vector<std::pair<int, double>> GeneticOptimizer::getFitnesses(std::vector<Phenotype> &population)
 {
-    std::vector<std::pair<int, float>> fitnesses(population.size());
+    std::vector<std::pair<int, double>> fitnesses(population.size());
 
     #pragma omp parallel for schedule(dynamic)
     for (int i = 0; i < population.size(); i++)
@@ -43,7 +43,7 @@ std::vector<std::pair<int, float>> GeneticOptimizer::getFitnesses(std::vector<Ph
     }
 
     // Sort by fitness, best fitness first
-    std::sort(fitnesses.begin(), fitnesses.end(), [&](std::pair<int, float> &f1, std::pair<int, float> &f2)
+    std::sort(fitnesses.begin(), fitnesses.end(), [&](std::pair<int, double> &f1, std::pair<int, double> &f2)
     {
         return f1.second > f2.second;
     });
@@ -64,7 +64,7 @@ bool GeneticOptimizer::stepForceAscent()
     // Update fitnesses
     auto fitnesses = getFitnesses(nextPopulation);
     int iBest = fitnesses.front().first;
-    float fBest = fitnesses.front().second;
+    double fBest = fitnesses.front().second;
 
     // Force ascent: only update if fitness improved
     if (fBest > currentBestFitness)
@@ -92,11 +92,11 @@ bool GeneticOptimizer::stepProper()
     bool newBestFound = false;
 
     // Evaluate fitness of population
-    std::vector<std::pair<int, float>> fitnesses = getFitnesses(currentPopulation);
+    std::vector<std::pair<int, double>> fitnesses = getFitnesses(currentPopulation);
 
     // Check if preview needs to be updated
     int iBest = fitnesses.front().first;
-    float fBest = fitnesses.front().second;
+    double fBest = fitnesses.front().second;
     if (fBest > currentBestFitness)
     {
         stepsWithoutImprovement = 0;
@@ -113,12 +113,12 @@ bool GeneticOptimizer::stepProper()
     }
 
     // Build fitness pdf
-    float fitnessSum = 0.0f;
-    for (std::pair<int, float> &e : fitnesses) { fitnessSum += e.second; }
-    for (std::pair<int, float> &e : fitnesses) { e.second /= fitnessSum; }
+    double fitnessSum = 0.0f;
+    for (std::pair<int, double> &e : fitnesses) { fitnessSum += e.second; }
+    for (std::pair<int, double> &e : fitnesses) { e.second /= fitnessSum; }
 
     // Build fitness cdf
-    std::vector<std::pair<int, float>> fitnessCdf(fitnesses.size());
+    std::vector<std::pair<int, double>> fitnessCdf(fitnesses.size());
     fitnessCdf[0] = fitnesses[0];
     for (int i = 1; i < fitnesses.size(); i++)
     {

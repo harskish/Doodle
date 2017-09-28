@@ -1,5 +1,4 @@
 #pragma once
-#include <float.h>
 #include "SDL.h"
 #include "Utils.h"
 
@@ -21,7 +20,7 @@ public:
 
 protected:
     SDL_Surface* currentBest;
-    float currentBestFitness;
+    double currentBestFitness;
     SDL_Surface const* target; // target of omtimization
 };
 
