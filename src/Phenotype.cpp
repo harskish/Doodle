@@ -165,7 +165,7 @@ void Phenotype::addCircle()
 
 void Phenotype::crossover(Phenotype &other)
 {
-    const int pCrossover = 50;
+    const int pCrossover = probs.crossover;
     if (rand() % 100 < pCrossover)
     {
         const int numSegments = 3;
@@ -209,7 +209,7 @@ void Phenotype::mutate()
     {
         bool mutated = false;
 
-        const int mutationRate = 5; // percent
+        const int mutationRate = probs.random;
         for (int g = 0; g < numCircles * genesPerCircle; g++)
         {
             if (rand() % 100 < mutationRate)
@@ -226,7 +226,7 @@ void Phenotype::mutate()
     {
         bool mutated = false;
 
-        const int mutationRate = 10; // percent
+        const int mutationRate = probs.perturbation;
         for (int g = 0; g < numCircles * genesPerCircle; g++)
         {
             if (rand() % 100 < mutationRate)
@@ -243,7 +243,7 @@ void Phenotype::mutate()
     {
         if (numCircles == 1) return false;
 
-        const int mutationRate = 15; 
+        const int mutationRate = probs.shuffle;
         if (rand() % 100 >= mutationRate) return false;
 
         int idx1, idx2;
@@ -260,7 +260,7 @@ void Phenotype::mutate()
 
     auto addCircleMutation = [&](std::vector<Gene> &genotype) -> bool
     {
-        const int mutationRate = 5; // percent
+        const int mutationRate = probs.addCircle;
         if (rand() % 100 < mutationRate)
         {
             addCircle();
@@ -274,7 +274,7 @@ void Phenotype::mutate()
     {
         if (numCircles == 1) return false;
 
-        const int mutationRate = 10; // percent
+        const int mutationRate = probs.removeCircle;
         if (rand() % 100 < mutationRate)
         {
             auto it = genotype.begin() + (rand() % numCircles) * genesPerCircle;

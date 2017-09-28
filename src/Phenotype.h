@@ -46,4 +46,15 @@ private:
     SDL_Surface const* target;
     double fitnessValue; // cached fitness value
     bool dirty; // is fitness value up to date?
+
+    // Genetic operator probabilities
+    struct
+    {
+        int crossover = 5;
+        int random = 5;
+        int shuffle = 10;
+        int addCircle = 25;
+        int removeCircle = 10;
+        int perturbation = 30;
+    } probs;
 };
