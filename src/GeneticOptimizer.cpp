@@ -4,7 +4,7 @@
 GeneticOptimizer::GeneticOptimizer(SDL_Surface const *reference) : Optimizer(reference)
 {
     generation = 0;
-    populationSize = 64;
+    populationSize = 16;
     stepsWithoutImprovement = 0;
     currentBestFitness = 0.0;
 
@@ -113,6 +113,13 @@ bool GeneticOptimizer::stepProper()
     }
     else {
         stepsWithoutImprovement++;
+    }
+
+    // Remove worst fitness from all (bring out differences)
+    double fWorst = fitnesses.back().second;
+    for(auto &f: fitnesses)
+    {
+        f.second -= fWorst;
     }
 
     // Build fitness pdf
