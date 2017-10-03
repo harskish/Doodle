@@ -17,6 +17,8 @@ public:
 private:
     Phenotype &selectParent(std::vector<std::pair<int, double>> &cdf);
     std::vector<std::pair<int, double>> getFitnesses(std::vector<Phenotype> &population);
+    std::vector<std::pair<int, double>> buildRouletteCdf(std::vector<std::pair<int, double>> &fitnesses);
+    std::vector<std::pair<int, double>> buildRankCdf(std::vector<std::pair<int, double>> &fitnesses);
 
     bool stepProper();
     bool stepForceAscent();

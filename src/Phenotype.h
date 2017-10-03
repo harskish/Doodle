@@ -53,8 +53,8 @@ private:
         int crossover = 10;
         int random = 5;
         int shuffle = 5;
-        int addCircle = 10;
-        int removeCircle = 10;
+        int addCircle = 45;
+        int removeCircle = 50;
         int perturbation = 30;
     } probs;
 };

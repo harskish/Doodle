@@ -4,7 +4,7 @@
 GeneticOptimizer::GeneticOptimizer(SDL_Surface const *reference) : Optimizer(reference)
 {
     generation = 0;
-    populationSize = 16;
+    populationSize = 4;
     stepsWithoutImprovement = 0;
     currentBestFitness = 0.0;
 
@@ -51,6 +51,56 @@ std::vector<std::pair<int, double>> GeneticOptimizer::getFitnesses(std::vector<P
 
     return fitnesses; // NRVO
 }
+
+std::vector<std::pair<int, double>> GeneticOptimizer::buildRouletteCdf(std::vector<std::pair<int, double>> &fitnesses) {
+    // Remove worst fitness from all (bring out differences)
+    double fWorst = fitnesses.back().second;
+    for(auto &f: fitnesses)
+    {
+        f.second -= (fWorst - 1); // no bias
+    }
+
+    // Build fitness pdf
+    double fitnessSum = 0.0f;
+    for (std::pair<int, double> &e : fitnesses) { fitnessSum += e.second; }
+    for (std::pair<int, double> &e : fitnesses) { e.second /= fitnessSum; }
+
+    // Build fitness cdf
+    std::vector<std::pair<int, double>> fitnessCdf(fitnesses.size());
+    fitnessCdf[0] = fitnesses[0];
+    for (int i = 1; i < fitnesses.size(); i++)
+    {
+        fitnessCdf[i].first = fitnesses[i].first;
+        fitnessCdf[i].second = fitnessCdf[i - 1].second + fitnesses[i].second;
+    }
+
+    return fitnessCdf;
+};
+
+std::vector<std::pair<int, double>> GeneticOptimizer::buildRankCdf(std::vector<std::pair<int, double>> &fitnesses) {
+    const double max = 1.1;
+    const double min = 2.0 - max;
+    const size_t n = fitnesses.size();
+
+    auto h = [&](int r) -> double { return max-(max-min)*(r-1)/(n-1); }; // r = rank
+
+    // Build pdf
+    for (int i = 0; i < n; i++)
+    {
+        fitnesses[i].second = h(i) / n;
+    }
+
+    // Build cdf
+    std::vector<std::pair<int, double>> fitnessCdf(fitnesses.size());
+    fitnessCdf[0] = fitnesses[0];
+    for (int i = 1; i < fitnesses.size(); i++)
+    {
+        fitnessCdf[i].first = fitnesses[i].first;
+        fitnessCdf[i].second = fitnessCdf[i - 1].second + fitnesses[i].second;
+    }
+
+    return fitnessCdf;
+};
 
 // Not correct from an algorithmic standpoint, but cool for visualizations
 bool GeneticOptimizer::stepForceAscent()
@@ -115,26 +165,8 @@ bool GeneticOptimizer::stepProper()
         stepsWithoutImprovement++;
     }
 
-    // Remove worst fitness from all (bring out differences)
-    double fWorst = fitnesses.back().second;
-    for(auto &f: fitnesses)
-    {
-        f.second -= fWorst;
-    }
-
-    // Build fitness pdf
-    double fitnessSum = 0.0f;
-    for (std::pair<int, double> &e : fitnesses) { fitnessSum += e.second; }
-    for (std::pair<int, double> &e : fitnesses) { e.second /= fitnessSum; }
-
-    // Build fitness cdf
-    std::vector<std::pair<int, double>> fitnessCdf(fitnesses.size());
-    fitnessCdf[0] = fitnesses[0];
-    for (int i = 1; i < fitnesses.size(); i++)
-    {
-        fitnessCdf[i].first = fitnesses[i].first;
-        fitnessCdf[i].second = fitnessCdf[i - 1].second + fitnesses[i].second;
-    }
+    //std::vector<std::pair<int, double>> fitnessCdf = buildRouletteCdf(fitnesses);
+    std::vector<std::pair<int, double>> fitnessCdf = buildRankCdf(fitnesses);
 
     // Build next generation by selection
     std::vector<Phenotype> nextPopulation;
@@ -167,10 +199,12 @@ bool GeneticOptimizer::stepProper()
 
 void GeneticOptimizer::printStats()
 {
-    auto fitnessPercentage = [&](double f){ return 100 * f / (255UL * 255UL * 3UL * target->w * target->h); };
+    auto fitnessPercentage = [&](double f){ return f / (255UL * 255UL * 3UL * target->w * target->h); };
 
-    printf("[GeneticOptimizer] Generation: %d, fitness: %f%% (best: %f%%)\n",
-           generation, fitnessPercentage(currentBestFitness), fitnessPercentage(bestSeenFitness));
+    double curr = 100 * pow(fitnessPercentage(currentBestFitness), 30);
+    double best = 100 * pow(fitnessPercentage(bestSeenFitness), 30);
+
+    printf("[GeneticOptimizer] Generation: %d, fitness: %f%% (best: %f%%)\n", generation, curr, best);
 }
 
 bool GeneticOptimizer::step()
