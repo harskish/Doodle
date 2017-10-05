@@ -21,6 +21,6 @@ public:
 protected:
     SDL_Surface* currentBest;
     double bestSeenFitness;
-    SDL_Surface const* target; // target of omtimization
+    SDL_Surface const* target; // target of optimization
 };
 

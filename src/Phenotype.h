@@ -16,6 +16,7 @@ class Phenotype
 {
 public:
     Phenotype(SDL_Surface const* reference);
+    Phenotype(void) = delete;
     ~Phenotype();
 
     Phenotype& operator=(Phenotype const&);
