@@ -2,13 +2,10 @@
 
 #include "Optimizer.h"
 #include "SDL.h"
-#include "Phenotype.h"
+#include "Solution.h"
 #include <iostream>
 #include <vector>
 #include <string>
-
-// TODO: Make Solution superclass of Phenotype
-typedef Phenotype Solution;
 
 /* Simulated Annealing Optimizer*/
 class AnnealingOptimizer : public Optimizer

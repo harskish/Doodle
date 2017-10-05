@@ -45,8 +45,8 @@ int main(int argc, char *argv[])
     SDL_RenderPresent(renderer);
 
     // Initialize optimizer
-    GeneticOptimizer opt(image);
-    //AnnealingOptimizer opt(image);
+    //GeneticOptimizer opt(image);
+    AnnealingOptimizer opt(image);
     srand((unsigned int)time(NULL));
 
     // Main loop

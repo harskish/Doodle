@@ -30,7 +30,7 @@ public:
     SDL_Surface *getImage() { return data; }
     int getNumCircles() { return numCircles; }
 
-private:
+protected:
     void randomInit();
     void draw();
     void drawCircle(Gene *genes);
@@ -48,6 +48,7 @@ private:
     double fitnessValue; // cached fitness value
     bool dirty; // is fitness value up to date?
 
+private:
     // Genetic operator probabilities
     struct
     {
