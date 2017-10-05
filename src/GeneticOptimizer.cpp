@@ -204,7 +204,7 @@ void GeneticOptimizer::printStats()
     double curr = 100 * pow(fitnessPercentage(currentBestFitness), 30);
     double best = 100 * pow(fitnessPercentage(bestSeenFitness), 30);
 
-    printf("[GeneticOptimizer] Generation: %d, fitness: %f%% (best: %f%%)\n", generation, curr, best);
+    printf("[GeneticOptimizer] Generation: %d, fitness: %.2f%% (best: %.2f%%)\n", generation, curr, best);
 }
 
 bool GeneticOptimizer::step()

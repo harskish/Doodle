@@ -16,6 +16,7 @@ public:
     AnnealingOptimizer(SDL_Surface const *reference);
     ~AnnealingOptimizer();
 
+    void printStats();
     bool step();
 
 private:
@@ -23,7 +24,7 @@ private:
     int steps;
     int stepsWithoutImprovement; // for restarting
     float T; // temperature
-    const float T0 = 1000.0f;
+    const float T0 = 10000.0f;
     const float Tend = 0.1f;
     Solution *current;
 

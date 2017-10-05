@@ -13,12 +13,22 @@ AnnealingOptimizer::~AnnealingOptimizer()
     delete current;
 }
 
+void AnnealingOptimizer::printStats()
+{
+    auto fitnessPercentage = [&](double f) { return f / (255UL * 255UL * 3UL * target->w * target->h); };
+
+    double curr = 100 * pow(fitnessPercentage(current->fitness()), 30);
+    double best = 100 * pow(fitnessPercentage(bestSeenFitness), 30);
+
+    printf("[AnnealingOptimizer] Iteration: %d, T: %.2f, fitness: %.2f%% (best: %.2f%%)\n", steps, T, curr, best);
+}
+
 bool AnnealingOptimizer::step()
 {
     // Cooling functions
     auto alpha1 = [](float T) -> float
     {
-        const float k = 0.95f;
+        const float k = 1.0f - 1e-6f;
         return k*T;
     };
 
@@ -67,5 +77,8 @@ bool AnnealingOptimizer::step()
     T = alpha1(T);
 
     steps++;
+    if (steps % 500 == 0)
+        printStats();
+
     return newBestFound;
 }
