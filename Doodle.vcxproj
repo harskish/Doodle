@@ -163,12 +163,14 @@
     <ClCompile Include="src\GeneticOptimizer.cpp" />
     <ClCompile Include="src\Optimizer.cpp" />
     <ClCompile Include="src\Phenotype.cpp" />
+    <ClCompile Include="src\Solution.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AnnealingOptimizer.h" />
     <ClInclude Include="src\GeneticOptimizer.h" />
     <ClInclude Include="src\Optimizer.h" />
     <ClInclude Include="src\Phenotype.h" />
+    <ClInclude Include="src\Solution.h" />
     <ClInclude Include="src\targetver.h" />
     <ClInclude Include="src\Utils.h" />
   </ItemGroup>
