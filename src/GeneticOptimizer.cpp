@@ -110,7 +110,6 @@ bool GeneticOptimizer::stepForceAscent()
     
     // Make mutations
     std::for_each(nextPopulation.begin(), nextPopulation.end(), [](Phenotype &p) { p.mutate(); });
-    generation++;
 
     // Update fitnesses
     auto fitnesses = getFitnesses(nextPopulation);
@@ -165,8 +164,8 @@ bool GeneticOptimizer::stepProper()
         stepsWithoutImprovement++;
     }
 
-    //std::vector<std::pair<int, double>> fitnessCdf = buildRouletteCdf(fitnesses);
-    std::vector<std::pair<int, double>> fitnessCdf = buildRankCdf(fitnesses);
+    std::vector<std::pair<int, double>> fitnessCdf = buildRouletteCdf(fitnesses);
+    //std::vector<std::pair<int, double>> fitnessCdf = buildRankCdf(fitnesses);
 
     // Build next generation by selection
     std::vector<Phenotype> nextPopulation;
@@ -189,11 +188,10 @@ bool GeneticOptimizer::stepProper()
     }
 
     // Replace previous generation
-    const bool forceAscent = false;
+    const bool forceAscent = true;
     if (!forceAscent || getFitnesses(nextPopulation).front().second > bestSeenFitness)
         currentPopulation = nextPopulation;
 
-    generation++;
     return newBestFound;
 }
 
@@ -207,12 +205,23 @@ void GeneticOptimizer::printStats()
     printf("[GeneticOptimizer] Generation: %d, fitness: %.2f%% (best: %.2f%%)\n", generation, curr, best);
 }
 
+void GeneticOptimizer::saveImage()
+{
+	std::string filename = "out/gen_out_" + std::to_string(generation / 1000) + "k.bmp";
+	SDL_SaveBMP(this->currentBest, filename.c_str());
+}
+
 bool GeneticOptimizer::step()
 {
-    if (generation % 50 == 0)
-        printStats();
+	generation++;
 
-    constexpr bool forceAscentMode = false; // less correct, but cool for visualzation
+	if (generation % 50 == 0)
+		printStats();
+
+	if (generation % 5000 == 0)
+		saveImage();
+	
+	constexpr bool forceAscentMode = true; // less correct, but cool for visualzation
     if (forceAscentMode)
         return stepForceAscent();
     else

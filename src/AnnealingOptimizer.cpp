@@ -13,6 +13,12 @@ AnnealingOptimizer::~AnnealingOptimizer()
     delete current;
 }
 
+void AnnealingOptimizer::saveImage()
+{
+	std::string filename = "out/sa_out_" + std::to_string(steps / 1000) + "k.bmp";
+	SDL_SaveBMP(this->currentBest, filename.c_str());
+}
+
 void AnnealingOptimizer::printStats()
 {
     auto fitnessPercentage = [&](double f) { return f / (255UL * 255UL * 3UL * target->w * target->h); };
@@ -20,7 +26,7 @@ void AnnealingOptimizer::printStats()
     double curr = 100 * pow(fitnessPercentage(current->fitness()), 30);
     double best = 100 * pow(fitnessPercentage(bestSeenFitness), 30);
 
-    printf("[AnnealingOptimizer] Iteration: %d, T: %.2f, fitness: %.2f%% (best: %.2f%%)\n", steps, T, curr, best);
+    printf("[AnnealingOptimizer] Iteration: %dk, T: %.2f, fitness: %.2f%% (best: %.2f%%)\n", steps / 1000, T, curr, best);
 }
 
 bool AnnealingOptimizer::step()
@@ -28,7 +34,7 @@ bool AnnealingOptimizer::step()
     // Cooling functions
     auto alpha1 = [](float T) -> float
     {
-        const float k = 1.0f - 1e-6f;
+        const float k = 1.0f - 1e-5f;
         return k*T;
     };
 
@@ -75,10 +81,12 @@ bool AnnealingOptimizer::step()
 
     // Cooling
     T = alpha1(T);
-
     steps++;
-    if (steps % 500 == 0)
-        printStats();
+
+	if (steps % 1000 == 0)
+		printStats();
+	if (steps % 5000 == 0)
+		saveImage();
 
     return newBestFound;
 }

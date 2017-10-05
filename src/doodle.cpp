@@ -45,8 +45,8 @@ int main(int argc, char *argv[])
     SDL_RenderPresent(renderer);
 
     // Initialize optimizer
-    //GeneticOptimizer opt(image);
-    AnnealingOptimizer opt(image);
+    GeneticOptimizer opt(image);
+    //AnnealingOptimizer opt(image);
     srand((unsigned int)time(NULL));
 
     // Main loop
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
         // Update preview
         if (updated)
         {   
-            progressTexture = SDL_CreateTextureFromSurface(renderer, opt.getCurrentBest());
+			progressTexture = SDL_CreateTextureFromSurface(renderer, opt.getCurrentBest());
             SDL_Rect rect = { width, 0, width, height }; // x, y, w, h
             SDL_RenderClear(renderer);
             SDL_RenderCopy(renderer, progressTexture, NULL, &rect); // current
@@ -74,9 +74,20 @@ int main(int argc, char *argv[])
         SDL_PollEvent(&event);
         switch (event.type)
         {
-            case SDL_QUIT:
-                running = false;
-                break;
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym)
+				{
+					case SDLK_ESCAPE:
+						running = false;
+						break;
+					case SDLK_F5:
+						SDL_SaveBMP(opt.getCurrentBest(), "out.bmp");
+						break;
+				}
+				break;
+			case SDL_QUIT:
+				running = false;
+				break;
         }
     }
 

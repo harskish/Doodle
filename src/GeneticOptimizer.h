@@ -5,6 +5,7 @@
 #include "Phenotype.h"
 #include <iostream>
 #include <vector>
+#include <string>
 
 class GeneticOptimizer : public Optimizer
 {
@@ -24,6 +25,7 @@ private:
     bool stepForceAscent();
 
     void printStats();
+	void saveImage();
 
     int generation;
     int populationSize;
