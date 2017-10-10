@@ -44,7 +44,7 @@ std::vector<std::pair<int, double>> GeneticOptimizer::getFitnesses(std::vector<P
     }
 
     // Sort by fitness, best fitness first
-    std::sort(fitnesses.begin(), fitnesses.end(), [&](std::pair<int, double> &f1, std::pair<int, double> &f2)
+    std::sort(fitnesses.begin(), fitnesses.end(), [](const std::pair<int, double> &f1, const std::pair<int, double> &f2)
     {
         return f1.second > f2.second;
     });
