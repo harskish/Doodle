@@ -4,7 +4,7 @@
 GeneticOptimizer::GeneticOptimizer(SDL_Surface const *reference) : Optimizer(reference)
 {
     generation = 0;
-    populationSize = 4;
+    populationSize = 128;
     stepsWithoutImprovement = 0;
     currentBestFitness = 0.0;
 
@@ -78,11 +78,11 @@ std::vector<std::pair<int, double>> GeneticOptimizer::buildRouletteCdf(std::vect
 };
 
 std::vector<std::pair<int, double>> GeneticOptimizer::buildRankCdf(std::vector<std::pair<int, double>> &fitnesses) {
-    const double max = 1.1;
+    const double max = 1.9; //1.1
     const double min = 2.0 - max;
     const size_t n = fitnesses.size();
 
-    auto h = [&](int r) -> double { return max-(max-min)*(r-1)/(n-1); }; // r = rank
+    auto h = [&](int r) -> double { return max-(max-min)*float(r-1)/(n-1); }; // r = rank
 
     // Build pdf
     for (int i = 0; i < n; i++)
@@ -188,7 +188,7 @@ bool GeneticOptimizer::stepProper()
     }
 
     // Replace previous generation
-    const bool forceAscent = true;
+    const bool forceAscent = false;
     if (!forceAscent || getFitnesses(nextPopulation).front().second > bestSeenFitness)
         currentPopulation = nextPopulation;
 
@@ -221,7 +221,7 @@ bool GeneticOptimizer::step()
 	if (generation % 5000 == 0)
 		saveImage();
 	
-	constexpr bool forceAscentMode = true; // less correct, but cool for visualzation
+	constexpr bool forceAscentMode = false; // less correct, but cool for visualzation
     if (forceAscentMode)
         return stepForceAscent();
     else
