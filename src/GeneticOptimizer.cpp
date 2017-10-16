@@ -109,7 +109,7 @@ bool GeneticOptimizer::stepForceAscent()
     std::vector<Phenotype> nextPopulation = currentPopulation;
     
     // Make mutations
-    std::for_each(nextPopulation.begin(), nextPopulation.end(), [](Phenotype &p) { p.mutate(); });
+    std::for_each(nextPopulation.begin(), nextPopulation.end(), [&](Phenotype &p) { p.mutate(generation); });
 
     // Update fitnesses
     auto fitnesses = getFitnesses(nextPopulation);
@@ -179,8 +179,8 @@ bool GeneticOptimizer::stepProper()
         p1.crossover(p2);
 
         // Mutate
-        p1.mutate();
-        p2.mutate();
+        p1.mutate(generation);
+        p2.mutate(generation);
 
         // Insert
         nextPopulation.push_back(p1);

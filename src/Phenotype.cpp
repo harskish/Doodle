@@ -203,7 +203,7 @@ void Phenotype::crossover(Phenotype &other)
     }
 }
 
-void Phenotype::mutate()
+void Phenotype::mutate(const int generation)
 {
     auto randomMutation = [&](std::vector<Gene> &genotype) -> bool
     {
@@ -270,6 +270,22 @@ void Phenotype::mutate()
         return false;
     };
 
+    // Decrease radius over time
+    auto addCircleDecreasingMutation = [&](std::vector<Gene> &genotype) -> bool
+    {
+        const int mutationRate = probs.addCircle;
+        if (rand() % 100 < mutationRate)
+        {
+            addCircle();
+            float scale = 1.3f * powf(generation + 500, -1.0f / 20.0f);
+            auto R = genotype.end() - 5;
+            *R = std::max((Gene)1, (Gene)(*R * scale));
+            return true;
+        }
+
+        return false;
+    };
+
     auto removeCircleMutation = [&](std::vector<Gene> &genotype) -> bool
     {
         if (numCircles == 1) return false;
@@ -290,6 +306,6 @@ void Phenotype::mutate()
     dirty |= randomMutation(genotype);
     dirty |= perturbationMutation(genotype);
     dirty |= shuffleMutation(genotype);
-    dirty |= addCircleMutation(genotype);
+    dirty |= addCircleDecreasingMutation(genotype);
     dirty |= removeCircleMutation(genotype);
 }
