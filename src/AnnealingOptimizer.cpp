@@ -6,11 +6,15 @@ AnnealingOptimizer::AnnealingOptimizer(SDL_Surface const * reference) : Optimize
     stepsWithoutImprovement = 0;
     T = T0;
     current = new Solution(reference);
+
+    progressStream.open("out/sa_stats.csv", std::ofstream::out | std::ofstream::trunc);
+    progressStream << "iteration,temperature,current,best\n";
 }
 
 AnnealingOptimizer::~AnnealingOptimizer()
 {
     delete current;
+    progressStream.close();
 }
 
 void AnnealingOptimizer::saveImage()
@@ -19,14 +23,22 @@ void AnnealingOptimizer::saveImage()
 	SDL_SaveBMP(this->currentBest, filename.c_str());
 }
 
-void AnnealingOptimizer::printStats()
+void AnnealingOptimizer::writeProgress()
 {
     auto fitnessPercentage = [&](double f) { return f / (255UL * 255UL * 3UL * target->w * target->h); };
 
-    double curr = 100 * pow(fitnessPercentage(current->fitness()), 30);
-    double best = 100 * pow(fitnessPercentage(bestSeenFitness), 30);
+    double curr = fitnessPercentage(current->fitness());
+    double currScaled = 100 * pow(curr, 30);
+    double best = fitnessPercentage(bestSeenFitness);
+    double bestScaled = 100 * pow(best, 30);
 
-    printf("[AnnealingOptimizer] Iteration: %dk, T: %.2f, fitness: %.2f%% (best: %.2f%%)\n", steps / 1000, T, curr, best);
+    printf("[AnnealingOptimizer] Iteration: %dk, T: %.2f, fitness: %.2f%% (best: %.2f%%)\n", steps / 1000, T, currScaled, bestScaled);
+
+    // Write to csv file
+    if (!progressStream.good())
+        std::cout << "Could not export progress to csv" << std::endl;
+    else
+        progressStream << steps << "," << T << "," << curr << "," << best << std::endl << std::flush;
 }
 
 bool AnnealingOptimizer::step()
@@ -84,7 +96,7 @@ bool AnnealingOptimizer::step()
     steps++;
 
 	if (steps % 1000 == 0)
-		printStats();
+		writeProgress();
 	if (steps % 5000 == 0)
 		saveImage();
 

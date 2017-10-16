@@ -1,4 +1,5 @@
 #pragma once
+#include <fstream>
 #include "SDL.h"
 #include "Utils.h"
 
@@ -18,9 +19,13 @@ public:
     // Poll (and eventually show) current progress
     SDL_Surface* getCurrentBest() { return currentBest; }
 
+    // Write to stdout and progress file (csv)
+    virtual void writeProgress() = 0;
+
 protected:
     SDL_Surface* currentBest;
     double bestSeenFitness;
     SDL_Surface const* target; // target of optimization
+    std::ofstream progressStream;
 };
 

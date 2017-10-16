@@ -11,7 +11,7 @@ class GeneticOptimizer : public Optimizer
 {
 public:
     GeneticOptimizer(SDL_Surface const *reference);
-    ~GeneticOptimizer() = default;
+    ~GeneticOptimizer();
 
     bool step();
 
@@ -24,7 +24,7 @@ private:
     bool stepProper();
     bool stepForceAscent();
 
-    void printStats();
+    void writeProgress();
 	void saveImage();
 
     int generation;

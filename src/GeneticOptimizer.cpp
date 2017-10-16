@@ -11,6 +11,14 @@ GeneticOptimizer::GeneticOptimizer(SDL_Surface const *reference) : Optimizer(ref
     for (int i = 0; i < populationSize; i++) {
         currentPopulation.push_back(Phenotype(reference));
     }
+
+    progressStream.open("out/gen_stats.csv", std::ofstream::out | std::ofstream::trunc);
+    progressStream << "generation,current,best\n";
+}
+
+GeneticOptimizer::~GeneticOptimizer()
+{
+    progressStream.close();
 }
 
 
@@ -195,14 +203,22 @@ bool GeneticOptimizer::stepProper()
     return newBestFound;
 }
 
-void GeneticOptimizer::printStats()
+void GeneticOptimizer::writeProgress()
 {
     auto fitnessPercentage = [&](double f){ return f / (255UL * 255UL * 3UL * target->w * target->h); };
 
-    double curr = 100 * pow(fitnessPercentage(currentBestFitness), 30);
-    double best = 100 * pow(fitnessPercentage(bestSeenFitness), 30);
+    double curr = fitnessPercentage(currentBestFitness);
+    double currScaled = 100 * pow(curr, 30);
+    double best = fitnessPercentage(bestSeenFitness);
+    double bestScaled = 100 * pow(best, 30);
 
-    printf("[GeneticOptimizer] Generation: %d, fitness: %.2f%% (best: %.2f%%)\n", generation, curr, best);
+    printf("[GeneticOptimizer] Generation: %d, fitness: %.2f%% (best: %.2f%%)\n", generation, currScaled, bestScaled);
+
+    // Write to csv file
+    if (!progressStream.good())
+        std::cout << "Could not export progress to csv" << std::endl;
+    else
+        progressStream << generation << "," << curr << "," << best << std::endl << std::flush;
 }
 
 void GeneticOptimizer::saveImage()
@@ -216,7 +232,7 @@ bool GeneticOptimizer::step()
 	generation++;
 
 	if (generation % 50 == 0)
-		printStats();
+		writeProgress();
 
 	if (generation % 5000 == 0)
 		saveImage();

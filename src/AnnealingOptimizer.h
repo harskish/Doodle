@@ -16,7 +16,7 @@ public:
 
 	void saveImage();
 
-    void printStats();
+    void writeProgress();
     bool step();
 
 private:
