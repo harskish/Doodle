@@ -25,7 +25,7 @@ void AnnealingOptimizer::saveImage()
 
 void AnnealingOptimizer::writeProgress()
 {
-    auto fitnessPercentage = [&](double f) { return f / (255UL * 255UL * 3UL * target->w * target->h); };
+    auto fitnessPercentage = [&](double f) { return f / ((Uint64)(255 * 255 * 3) * (Uint64)target->w * (Uint64)target->h); };
 
     double curr = fitnessPercentage(current->fitness());
     double currScaled = 100 * pow(curr, 30);

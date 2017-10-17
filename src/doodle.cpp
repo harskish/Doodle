@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     atexit(SDL_Quit);
     //SDL_GL_SetSwapInterval(0); // disable double buffered vsync
 
-    SDL_Surface* tmp = SDL_LoadBMP("bliss_20.bmp"); // CPU memory
+    SDL_Surface* tmp = SDL_LoadBMP("bull.bmp"); // CPU memory
     if (tmp == NULL)
     {
         std::cout << "Unable to load image\n";
