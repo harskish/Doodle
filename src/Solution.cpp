@@ -1,5 +1,16 @@
 #include "Solution.h"
 
+void Solution::writeProbs(std::ofstream & out)
+{
+    out << "Shuffle: " << probs.shuffle << "%" << std::endl;
+    out << "Add Circle: " << probs.addCircle << "%" << std::endl;
+    out << "Remove Circle: " << probs.removeCircle << "%" << std::endl;
+    out << "Perturbation: " << probs.perturbation << "%" << std::endl;
+    out << "Initial circles: " << numCircles << std::endl;
+    out << "Min X: " << geneToX((Gene)0) << std::endl;
+    out << "Max R: " << geneToRadius((Gene)255) << std::endl;
+}
+
 void Solution::mutate(int iteration)
 {
 	auto perturbationMutation = [&](std::vector<Gene> &genotype) -> bool

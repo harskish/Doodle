@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <fstream>
 #include <vector>
 #include <set>
 #include "SDL.h"
@@ -29,6 +30,8 @@ public:
 
     SDL_Surface *getImage() { return data; }
     int getNumCircles() { return numCircles; }
+
+    void writeProbs(std::ofstream &out);
 
 protected:
     void randomInit();
@@ -59,4 +62,6 @@ private:
         int removeCircle = 10;
         int perturbation = 30;
     } probs;
+
+    const int crossoverSegments = 3;
 };

@@ -9,6 +9,7 @@ AnnealingOptimizer::AnnealingOptimizer(SDL_Surface const * reference) : Optimize
 
     progressStream.open("out/sa_stats.csv", std::ofstream::out | std::ofstream::trunc);
     progressStream << "iteration,temperature,current,best\n";
+    writeParameters();
 }
 
 AnnealingOptimizer::~AnnealingOptimizer()
@@ -21,6 +22,22 @@ void AnnealingOptimizer::saveImage()
 {
 	std::string filename = "out/sa_out_" + std::to_string(steps / 1000) + "k.bmp";
 	SDL_SaveBMP(this->currentBest, filename.c_str());
+}
+
+void AnnealingOptimizer::writeParameters()
+{
+    std::ofstream paramFile("out/sa_params.txt", std::ofstream::out | std::ofstream::trunc);
+
+    if (!paramFile.good())
+        std::cout << "Could not export simulation parameters" << std::endl;
+    else
+    {
+        paramFile << "Algorithm: Simulated Annealing Optimizer" << std::endl;
+        paramFile << "Cooling function: " << coolingFunction << "(k=" << ((coolingFunction == 1) ? k1 : k2) << ")" <<  std::endl;
+        paramFile << "T0: " << T0 << std::endl;
+        current->writeProbs(paramFile);
+        paramFile.close();
+    }
 }
 
 void AnnealingOptimizer::writeProgress()
@@ -44,16 +61,14 @@ void AnnealingOptimizer::writeProgress()
 bool AnnealingOptimizer::step()
 {
     // Cooling functions
-    auto alpha1 = [](float T) -> float
+    auto alpha1 = [&](float T) -> float
     {
-        const float k = 1.0f - 1e-5f;
-        return k*T;
+        return k1*T;
     };
 
-    auto alpha2 = [](float T) -> float
+    auto alpha2 = [&](float T) -> float
     {
-        const float k = 0.005f;
-        return T / (1 + k*T);
+        return T / (1 + k2*T);
     };
 
     // Acceptance probability, ascent -> always accept, descent -> accept probabilistically
@@ -92,7 +107,7 @@ bool AnnealingOptimizer::step()
     }
 
     // Cooling
-    T = alpha1(T);
+    T = (coolingFunction == 1) ? alpha1(T) : alpha2(T);
     steps++;
 
 	if (steps % 1000 == 0)

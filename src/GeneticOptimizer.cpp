@@ -14,6 +14,7 @@ GeneticOptimizer::GeneticOptimizer(SDL_Surface const *reference) : Optimizer(ref
 
     progressStream.open("out/gen_stats.csv", std::ofstream::out | std::ofstream::trunc);
     progressStream << "generation,current,best\n";
+    writeParameters();
 }
 
 GeneticOptimizer::~GeneticOptimizer()
@@ -172,8 +173,8 @@ bool GeneticOptimizer::stepProper()
         stepsWithoutImprovement++;
     }
 
-    std::vector<std::pair<int, double>> fitnessCdf = buildRouletteCdf(fitnesses);
-    //std::vector<std::pair<int, double>> fitnessCdf = buildRankCdf(fitnesses);
+    // Build CDF for parent sampling
+    auto fitnessCdf = (useRankCdf) ? buildRankCdf(fitnesses) : buildRouletteCdf(fitnesses);
 
     // Build next generation by selection
     std::vector<Phenotype> nextPopulation;
@@ -221,6 +222,23 @@ void GeneticOptimizer::writeProgress()
         progressStream << generation << "," << curr << "," << best << std::endl << std::flush;
 }
 
+void GeneticOptimizer::writeParameters()
+{
+    std::ofstream paramFile("out/gen_params.txt", std::ofstream::out | std::ofstream::trunc);
+
+    if (!paramFile.good())
+        std::cout << "Could not export simulation parameters" << std::endl;
+    else
+    {
+        paramFile << "Algorithm: Genetic Optimizer" << std::endl;
+        paramFile << "Mode: " << ((forceAscentMode) ? "Force ascent" : "Standard") << std::endl;
+        paramFile << "CDF type: " << ((useRankCdf) ? "Rank" : "Roulette") << std::endl;
+        paramFile << "Population size: " << populationSize << std::endl;
+        currentPopulation.front().writeProbs(paramFile);
+        paramFile.close();
+    }       
+}
+
 void GeneticOptimizer::saveImage()
 {
 	std::string filename = "out/gen_out_" + std::to_string(generation / 1000) + "k.bmp";
@@ -237,7 +255,6 @@ bool GeneticOptimizer::step()
 	if (generation % 5000 == 0)
 		saveImage();
 	
-	constexpr bool forceAscentMode = false; // less correct, but cool for visualzation
     if (forceAscentMode)
         return stepForceAscent();
     else

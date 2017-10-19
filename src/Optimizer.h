@@ -21,6 +21,7 @@ public:
 
     // Write to stdout and progress file (csv)
     virtual void writeProgress() = 0;
+    virtual void writeParameters() = 0;
 
 protected:
     SDL_Surface* currentBest;

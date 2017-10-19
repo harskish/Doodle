@@ -157,7 +157,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\AnnealingcOptimizer.cpp" />
     <ClCompile Include="src\AnnealingOptimizer.cpp" />
     <ClCompile Include="src\doodle.cpp" />
     <ClCompile Include="src\GeneticOptimizer.cpp" />

@@ -7,6 +7,7 @@ class Solution : public Phenotype
 public:
 	Solution(SDL_Surface const* reference) : Phenotype(reference) {};
 
+    void writeProbs(std::ofstream &out);
 	void mutate(int iteration); // used to find neighbors
 
 private:

@@ -27,9 +27,6 @@
     <ClCompile Include="src\Phenotype.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\AnnealingcOptimizer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\AnnealingOptimizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -63,6 +63,20 @@ inline int Phenotype::geneToRadius(Gene g)
     return R;
 }
 
+void Phenotype::writeProbs(std::ofstream & out)
+{
+    out << "Crossover: " << probs.crossover << "%" << std::endl;
+    out << "Random: " << probs.random << "%" << std::endl;
+    out << "Shuffle: " << probs.shuffle << "%" << std::endl;
+    out << "Add Circle: " << probs.addCircle << "%" << std::endl;
+    out << "Remove Circle: " << probs.removeCircle << "%" << std::endl;
+    out << "Perturbation: " << probs.perturbation << "%" << std::endl;
+    out << "Crossover segments: " << crossoverSegments << std::endl;
+    out << "Initial circles: " << numCircles << std::endl;
+    out << "Min X: " << geneToX((Gene)0) << std::endl;
+    out << "Max R: " << geneToRadius((Gene)255) << std::endl;
+}
+
 // Chromosomes normalized into range [0,255], corresponding physical quantities scaled
 void Phenotype::randomInit()
 {
@@ -170,11 +184,10 @@ void Phenotype::crossover(Phenotype &other)
     const int pCrossover = probs.crossover;
     if (rand() % 100 < pCrossover)
     {
-        const int numSegments = 3;
         std::set<int> indexSet;
 
         const int minLen = std::min(this->genotype.size(), other.genotype.size());
-        while (indexSet.size() < numSegments - 1)
+        while (indexSet.size() < crossoverSegments - 1)
         {
             indexSet.insert(rand() % (minLen - 1) + 1); // exclude 0
         }
@@ -189,7 +202,7 @@ void Phenotype::crossover(Phenotype &other)
         // => middle portion swapped
 
         // Every second segment swapped (N >= 2 segments)
-        for (int seg = 1; seg < numSegments; seg += 2)
+        for (int seg = 1; seg < crossoverSegments; seg += 2)
         {
             int s = indices[seg - 1];
             int e = indices[seg];

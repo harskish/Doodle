@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     atexit(SDL_Quit);
     //SDL_GL_SetSwapInterval(0); // disable double buffered vsync
 
-    SDL_Surface* tmp = SDL_LoadBMP("bull.bmp"); // CPU memory
+    SDL_Surface* tmp = SDL_LoadBMP("mona_half.bmp"); // CPU memory
     if (tmp == NULL)
     {
         std::cout << "Unable to load image\n";
@@ -45,8 +45,8 @@ int main(int argc, char *argv[])
     SDL_RenderPresent(renderer);
 
     // Initialize optimizer
-    GeneticOptimizer opt(image);
-    //AnnealingOptimizer opt(image);
+    //GeneticOptimizer opt(image);
+    AnnealingOptimizer opt(image);
     srand((unsigned int)time(NULL));
 
     // Main loop

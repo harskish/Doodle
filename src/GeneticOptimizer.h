@@ -25,6 +25,7 @@ private:
     bool stepForceAscent();
 
     void writeProgress();
+    void writeParameters();
 	void saveImage();
 
     int generation;
@@ -32,6 +33,10 @@ private:
     int stepsWithoutImprovement;
 
     double currentBestFitness; // of current population
+
+    // Simulation parameters
+    bool forceAscentMode = false; // less correct, but cool for visualzation
+    bool useRankCdf = true;
 
     // Population
     std::vector<Phenotype> currentPopulation;

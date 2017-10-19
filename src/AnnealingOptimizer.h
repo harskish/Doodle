@@ -16,6 +16,7 @@ public:
 
 	void saveImage();
 
+    void writeParameters();
     void writeProgress();
     bool step();
 
@@ -26,6 +27,9 @@ private:
     float T; // temperature
     const float T0 = 10.0f;
     const float Tend = 0.1f;
+    const int coolingFunction = 1; // 1 or 2
+    const float k1 = 1.0f - 1e-5f;
+    const float k2 = 0.005f;
     Solution *current;
 
 };
