@@ -64,7 +64,7 @@ bool AnnealingOptimizer::step()
 
     // Pick a random neighbor
     Solution n = *current;
-    n.mutate();
+    n.mutate(steps);
 
     // Check acceptance
     bool newBestFound = false;

@@ -1,6 +1,6 @@
 #include "Solution.h"
 
-void Solution::mutate()
+void Solution::mutate(int iteration)
 {
 	auto perturbationMutation = [&](std::vector<Gene> &genotype) -> bool
 	{
@@ -11,7 +11,7 @@ void Solution::mutate()
 		{
 			if (rand() % 100 < mutationRate)
 			{
-				genotype[g] += (-10 + rand() % 21);
+                genotype[g] = std::max(0, std::min(255, genotype[g] + (-20 + rand() % 41)));
 				mutated = true;
 			}
 		}
@@ -50,6 +50,21 @@ void Solution::mutate()
 		return false;
 	};
 
+    auto addCircleDecreasingMutation = [&](std::vector<Gene> &genotype) -> bool
+    {
+        const int mutationRate = probs.addCircle;
+        if (rand() % 100 < mutationRate)
+        {
+            addCircle();
+            float scale = 1.3f * powf(iteration + 500, -1.0f / 20.0f);
+            auto R = genotype.end() - 5;
+            *R = std::max((Gene)1, (Gene)(*R * scale));
+            return true;
+        }
+
+        return false;
+    };
+
 	auto removeCircleMutation = [&](std::vector<Gene> &genotype) -> bool
 	{
 		if (numCircles == 1) return false;
@@ -69,6 +84,6 @@ void Solution::mutate()
 	// Perform mutations
 	dirty |= perturbationMutation(genotype);
 	dirty |= shuffleMutation(genotype);
-	dirty |= addCircleMutation(genotype);
+	dirty |= addCircleDecreasingMutation(genotype);
 	dirty |= removeCircleMutation(genotype);
 }

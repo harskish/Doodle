@@ -42,6 +42,7 @@ inline int Phenotype::geneToX(Gene g)
 {
     int w = data->w;
     int x = -w / 2 + g * (2 * w) / 255;
+    //int x = g * w / 255;
     return x;
 }
 
@@ -50,6 +51,7 @@ inline int Phenotype::geneToY(Gene g)
 {
     int h = data->h;
     int y = -h / 2 + g * (2 * h) / 255;
+    //int y = g * h / 255;
     return y;
 }
 
@@ -231,7 +233,7 @@ void Phenotype::mutate(const int generation)
         {
             if (rand() % 100 < mutationRate)
             {
-                genotype[g] += (-10 + rand() % 21);
+                genotype[g] = std::max(0, std::min(255, genotype[g] + (-20 + rand() % 41)));
                 mutated = true;
             }
         }

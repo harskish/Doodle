@@ -7,7 +7,7 @@ class Solution : public Phenotype
 public:
 	Solution(SDL_Surface const* reference) : Phenotype(reference) {};
 
-	void mutate(); // used to find neighbors
+	void mutate(int iteration); // used to find neighbors
 
 private:
 	struct
