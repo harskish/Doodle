@@ -55,12 +55,12 @@ private:
     // Genetic operator probabilities
     struct
     {
-        int crossover = 1;
-        int random = 1;
-        int shuffle = 5;
-        int addCircle =  10;
-        int removeCircle = 10;
-        int perturbation = 30;
+        int crossover = 1;     // once
+        int random = 1;        // per gene
+        int shuffle = 5;       // once
+        int addCircle =  10;   // once
+        int removeCircle = 10; // once
+        int perturbation = 30; // per gene
     } probs;
 
     const int crossoverSegments = 3;

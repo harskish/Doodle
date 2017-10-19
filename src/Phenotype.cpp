@@ -318,9 +318,9 @@ void Phenotype::mutate(const int generation)
     };
 
     // Perform mutations
-    dirty |= randomMutation(genotype);
-    dirty |= perturbationMutation(genotype);
-    dirty |= shuffleMutation(genotype);
     dirty |= addCircleDecreasingMutation(genotype);
     dirty |= removeCircleMutation(genotype);
+    dirty |= shuffleMutation(genotype);
+    dirty |= randomMutation(genotype);
+    dirty |= perturbationMutation(genotype);    
 }

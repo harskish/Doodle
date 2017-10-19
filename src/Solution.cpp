@@ -93,8 +93,8 @@ void Solution::mutate(int iteration)
 	};
 
 	// Perform mutations
-	dirty |= perturbationMutation(genotype);
-	dirty |= shuffleMutation(genotype);
-	dirty |= addCircleDecreasingMutation(genotype);
-	dirty |= removeCircleMutation(genotype);
+    dirty |= addCircleDecreasingMutation(genotype);
+    dirty |= removeCircleMutation(genotype);
+    dirty |= shuffleMutation(genotype);
+    dirty |= perturbationMutation(genotype);
 }
