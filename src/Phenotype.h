@@ -64,4 +64,5 @@ private:
     } probs;
 
     const int crossoverSegments = 3;
+    const int initialCircles = 1;
 };

@@ -4,7 +4,7 @@ Phenotype::Phenotype(SDL_Surface const* reference)
 {
     target = reference;
     data = surfaceWithEndian(target->w, target->h);
-    numCircles = 1;
+    numCircles = initialCircles;
     dirty = true;
     randomInit();
 }
