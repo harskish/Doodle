@@ -154,6 +154,10 @@ bool GeneticOptimizer::stepProper()
     // Evaluate fitness of population
     std::vector<std::pair<int, double>> fitnesses = getFitnesses(currentPopulation);
 
+    // Restrict breeding pool
+    int toBreed = fitnesses.size() * selectionCutoff / 100;
+    fitnesses.resize(toBreed);
+
     // Check if preview needs to be updated
     int iBest = fitnesses.front().first;
     double fBest = fitnesses.front().second;
@@ -234,6 +238,7 @@ void GeneticOptimizer::writeParameters()
         paramFile << "Mode: " << ((forceAscentMode) ? "Force ascent" : "Standard") << std::endl;
         paramFile << "CDF type: " << ((useRankCdf) ? "Rank" : "Roulette") << std::endl;
         paramFile << "Population size: " << populationSize << std::endl;
+        paramFile << "Breeding cutoff: " << selectionCutoff << "%" << std::endl;
         currentPopulation.front().writeProbs(paramFile);
         paramFile.close();
     }       

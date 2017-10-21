@@ -36,7 +36,8 @@ private:
 
     // Simulation parameters
     bool forceAscentMode = false; // less correct, but cool for visualzation
-    bool useRankCdf = true;
+    bool useRankCdf = false;
+    const int selectionCutoff = 30; // best X percent that get to breed
 
     // Population
     std::vector<Phenotype> currentPopulation;
