@@ -13,6 +13,23 @@ void Solution::writeProbs(std::ofstream & out)
 
 void Solution::mutate(int iteration)
 {
+    auto randomMutation = [&](std::vector<Gene> &genotype) -> bool
+    {
+        bool mutated = false;
+
+        const int mutationRate = probs.random;
+        for (int g = 0; g < numCircles * genesPerCircle; g++)
+        {
+            if (rand() % 100 < mutationRate)
+            {
+                genotype[g] = randGene();
+                mutated = true;
+            }
+        }
+
+        return mutated;
+    };
+
 	auto perturbationMutation = [&](std::vector<Gene> &genotype) -> bool
 	{
 		bool mutated = false;
@@ -92,7 +109,8 @@ void Solution::mutate(int iteration)
 		return false;
 	};
 
-	// Perform mutations
+	// Perform mutations (explore neighborhood)
+    dirty |= randomMutation(genotype);
     dirty |= addCircleDecreasingMutation(genotype);
     dirty |= removeCircleMutation(genotype);
     dirty |= shuffleMutation(genotype);

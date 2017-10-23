@@ -13,9 +13,10 @@ public:
 private:
 	struct
 	{
-		int shuffle = 5;       // per gene
-		int addCircle = 15;    // once
-		int removeCircle = 15; // once
-		int perturbation = 10; // per gene
+        int random = 1;       // per gene
+		int shuffle = 5;      // once
+		int addCircle = 0;    // once
+		int removeCircle = 0; // once
+		int perturbation = 2; // per gene
 	} probs;
 };
