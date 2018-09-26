@@ -15,8 +15,8 @@ private:
 	{
         int random = 1;       // per gene
 		int shuffle = 5;      // once
-		int addCircle = 0;    // once
-		int removeCircle = 0; // once
+		int addCircle = 10;    // once
+		int removeCircle = 12; // once
 		int perturbation = 2; // per gene
 	} probs;
 };
